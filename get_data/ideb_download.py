@@ -51,9 +51,20 @@ class IdebDownload:
         
         return self.unzip(content, self.file_finais, self.path_dados)
     
-    def __call__(self):
+    def __call__(self, tipo='all'):
+
+        if tipo =='all':
         
-        self.download_and_unzip_inicias()
-        print('Anos iniciais Ideb baixados com sucesso')
-        self.download_and_unzip_finais()
-        print('Anos finais Ideb baixados com sucesso')
+            self.download_and_unzip_inicias()
+            print('Anos iniciais Ideb baixados com sucesso')
+            self.download_and_unzip_finais()
+            print('Anos finais Ideb baixados com sucesso')
+        
+        elif tipo == 'iniciais':
+            self.download_and_unzip_inicias()
+            print('Anos iniciais Ideb baixados com sucesso')
+        elif tipo == 'finais':
+            self.download_and_unzip_finais()
+            print('Anos finais Ideb baixados com sucesso')
+        else:
+            raise ValueError(f'Tipo {tipo} inexistente!')

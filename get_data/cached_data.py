@@ -2,6 +2,7 @@ import os
 import pandas as pd
 from .dados_cadastro_escola import DadosCadastroEscola
 from .parse_ideb import DataIdebFinais, DataIdebIniciais
+from .merge_cadastro_ideb import JoinData
 
 def download_df_salvo(path_salvo):
     
@@ -50,3 +51,22 @@ def cadastro_2019():
     cadastro_2019 = pegar_cadastro.dataframe_ano(2019)
     
     return cadastro_2019 
+
+def merged_data():
+
+    path_salvo = 'data/cadastro_ideb_merged.csv'
+    df = download_df_salvo(path_salvo)
+    if df is not None:
+        print('Dados merged cacheados.')
+        return df
+    
+    iniciais = ideb_iniciais()
+    finais = ideb_finais()
+    cadastro = cadastro_2019()
+
+    join = JoinData()
+    df = join(cadastro, iniciais, finais, path_salvar='data')
+
+    return df
+
+    
