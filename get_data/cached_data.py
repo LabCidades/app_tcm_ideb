@@ -1,8 +1,10 @@
 import os
 import pandas as pd
+import geopandas as gpd
 from .dados_cadastro_escola import DadosCadastroEscola
 from .parse_ideb import DataIdebFinais, DataIdebIniciais
 from .merge_cadastro_ideb import JoinData
+from .distritos_shp import DownloadShapeDists
 
 def download_df_salvo(path_salvo):
     
@@ -12,6 +14,17 @@ def download_df_salvo(path_salvo):
             df.drop("Unnamed: 0",axis=1,inplace=True)
         return df
     return None
+
+def download_shape_salvo(path_salvo, epsg):
+
+    if os.path.exists(path_salvo):
+        geodf = gpd.read_file(path_salvo)
+        if "Unnamed: 0" in geodf:
+            geodf.drop("Unnamed: 0",axis=1,inplace=True)
+        geodf.set_crs(epsg = epsg, inplace=True)
+        return geodf
+    return None
+
 
 def ideb_finais():
     
@@ -68,5 +81,19 @@ def merged_data():
     df = join(cadastro, iniciais, finais, path_salvar='data')
 
     return df
+
+def distritos():
+
+    path_salvo = 'data/geo_data/SIRGAS_SHP_distrito'
+    geodf = download_shape_salvo(path_salvo, 31983)
+    if geodf is not None:
+        print('Dados distrito shape cacheados.')
+        return geodf
+
+    download_distritos = DownloadShapeDists()
+    geodf = download_distritos()
+
+    return geodf
+
 
     

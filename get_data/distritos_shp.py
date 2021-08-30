@@ -1,5 +1,8 @@
 import requests
 import os
+from zipfile import ZipFile
+from io import BytesIO
+import geopandas as gpd
 
 class DownloadShapeDists:
     
@@ -31,6 +34,17 @@ class DownloadShapeDists:
         path_dados = self.solve_data_dir(path_dados)
         
         zip_file.extractall(path_dados)
+
+    def open_shape(self, path_dados=None):
+
+        path_dados = self.solve_data_dir(path_dados)
+        path_file = os.path.join(path_dados, 'SIRGAS_SHP_distrito/SIRGAS_SHP_distrito_polygon.shp')
+
+        geodf = gpd.read_file(path_file)
+
+        geodf.set_crs(epsg = 31983, inplace=True)
+
+        return geodf
         
     def __call__(self):
         
@@ -38,3 +52,7 @@ class DownloadShapeDists:
         
         self.unzip(shape_zip)
         print("Shape distritos baixado e salvado com sucesso")
+
+        geodf = self.open_shape()
+        
+        return geodf
