@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+from .dados_cadastro_escola import DadosCadastroEscola
 from .parse_ideb import DataIdebFinais, DataIdebIniciais
 
 def download_df_salvo(path_salvo):
@@ -16,6 +17,7 @@ def ideb_finais():
     path_salvo = 'raw_data/ideb_parsed/dados_ideb_finais.csv'
     df = download_df_salvo(path_salvo)
     if df is not None:
+        print('Ideb finais cacheado.')
         return df
     
     finais = DataIdebFinais()
@@ -28,10 +30,23 @@ def ideb_iniciais():
     path_salvo = 'raw_data/ideb_parsed/dados_ideb_iniciais.csv'
     df = download_df_salvo(path_salvo)
     if df is not None:
+        print('Ideb inicias cacheado.')
         return df
     
     iniciais = DataIdebIniciais()
     iniciais.save_data()
     
     return iniciais.data
-        
+
+def cadastro_2019():
+
+    path_salvo = 'raw_data/cadastro_2019/cadastro_2019.csv'
+    df = download_df_salvo(path_salvo)
+    if df is not None:
+        print('Dados cadastro 2019 cacheados.')
+        return df
+    
+    pegar_cadastro = DadosCadastroEscola()
+    cadastro_2019 = pegar_cadastro.dataframe_ano(2019)
+    
+    return cadastro_2019 
