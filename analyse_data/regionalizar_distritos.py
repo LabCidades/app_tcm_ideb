@@ -1,5 +1,5 @@
 import pandas as pd
-from get_data import distritos_shp, get_data, get_distritos
+from get_data import get_data, get_distritos
 
 class RegionalizarDistritos:
 
