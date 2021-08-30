@@ -1,20 +1,29 @@
 import os
 import pandas as pd
 from openpyxl import load_workbook
+from .ideb_download import IdebDownload
 
 
 class ParseIdeb:
     
-    def __init__(self, filename, sheet_name, row_ini, row_fim, columns):
+    def __init__(self, filename, sheet_name, row_ini, row_fim, columns, tipo):
         
+        self.download = IdebDownload()
         self.filename = filename
         self.sheet_name = sheet_name
         self.row_ini = row_ini
         self.row_fim= row_fim
         self.columns = columns
+        self.tipo = tipo
+
+    def download_data_if_needs(self, filename, tipo):
+
+        if not os.path.exists(filename):
+            self.download(tipo=tipo)
         
-    def load_wb(self, filename):
+    def load_wb(self, filename, tipo):
         
+        self.download_data_if_needs(filename, tipo)
         wb = load_workbook(filename)
         
         return wb
@@ -38,7 +47,7 @@ class ParseIdeb:
     
     def __call__(self):
         
-        wb = self.load_wb(self.filename)
+        wb = self.load_wb(self.filename, self.tipo)
         sheet = self.get_sheet(wb, self.sheet_name)
         
         data = self.parse_data(sheet, self.row_ini,
@@ -71,7 +80,8 @@ class DataIdebIniciais:
                                 self.sheet,
                                 self.row_inicio, 
                                 self.row_fim, 
-                                self.columns)
+                                self.columns,
+                                tipo='iniciais')
         
         self.__data = self.parser()
         self.__data['tipo_anos'] = 'iniciais'
@@ -117,7 +127,8 @@ class DataIdebFinais:
                                 self.sheet,
                                 self.row_inicio, 
                                 self.row_fim, 
-                                self.columns)
+                                self.columns,
+                                tipo='finais')
         
         self.__data = self.parser()
         self.__data['tipo_anos'] = 'finais'
