@@ -28,7 +28,7 @@ class DadosAbertos:
     
     def gerar_sopa(self, html):
         
-        return BeautifulSoup(html, features="lxml")
+        return BeautifulSoup(html, "html.parser")
     
     def listar_recursos(self, sopa):
         
