@@ -32,9 +32,11 @@ collapse = html.Div(
             n_clicks=0,
         ),
         dbc.Collapse(
-            dbc.Card(dbc.CardBody('''Aqui vem um texto explicativo sobre o dashboard.
-                                    Falando sobre o que é o IDEB e outras cositas mais.
-                                    Que eu vou pedir pra você escrever pra mim porque o que eu gosto mesmo é codar.''')),
+            dbc.Card(dbc.CardBody('''O mapa de calor acima permite uma visualização da média do Ideb por Distrito da cidade de São Paulo.\n
+            Os dados do Ideb foram retirados diretamente do Inep e, a partir dele, calculamos uma média do Ideb das escolas de cada distrito para se chegar à média por Distrito.\n
+            Essa forma de visualizar as informações permite uma análise regionalizada desse indicador de aprendizagem.\n
+            O Ideb é um indicador de nível de aprendizagem usado no Ensino Fundamental, mas deve ser analisado levando-se em conta outros fatores como o Inse.\n
+            Para que tenhamos uma visão mais abrangente também vamos incluir em nossa plataforma e em nossas análises outros indicadores de aprendizagem que englobam características da comunidade e da escola como o Idep.''')),
             id="collapse",
             is_open=False,
         ),
