@@ -37,7 +37,7 @@ def gerar_mapa(geodf):
     zmax = geodf['ideb_2019'].max(),
     ))
     fig.update_geos(fitbounds="locations", visible=False)
-    fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+    fig.update_layout(margin={"r":0,"t":20,"l":0,"b":0})
 
     return fig
 
