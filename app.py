@@ -3,7 +3,9 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
-import plotly.express as px
+import plotly.graph_objects as go
+import pandas as pd
+import json
 from front_end import navbar, collapse
 from analyse_data.regionalizar_distritos import RegionalizarDistritos
 
@@ -12,24 +14,30 @@ regionalizar = RegionalizarDistritos()
 def gerar_geodf(anos_ideb):
 
     geodf = regionalizar(anos_ideb)
-
     geodf['geometry'] = geodf['geometry'].to_crs(epsg=4126)
-    geodf.rename({'ds_nome' : 'Distrito'}, axis=1, inplace=True)
-    geodf.set_index('Distrito', inplace=True)
+    geodf['text'] = geodf['ds_nome'] + ':<br>Nota média:' \
+        + geodf['ideb_2019'].apply(lambda x: str(round(x,2)) if not pd.isnull(x) else 'Não se aplica')
 
     return geodf
 
 def gerar_mapa(geodf):
-
-    fig = px.choropleth(
-        geodf,
-        geojson=geodf.geometry,
-        locations=geodf.index,
-        color = 'ideb_2019',
-        color_continuous_scale = 'Reds'
-        )
+    
+    min_ideb = geodf['ideb_2019'].min()
+    geodf['ideb_2019'].fillna(0, inplace=True)
+    fig = go.Figure(data=go.Choropleth(
+    geojson=json.loads(geodf.geometry.to_json()),
+    locations=geodf.index,
+    z=geodf['ideb_2019'],
+    colorscale='Reds',
+    autocolorscale=False,
+    text=geodf['text'], # hover text
+    hoverinfo = 'text',
+    colorbar_title="IDEB 2019",
+    zmin=min_ideb,
+    zmax = geodf['ideb_2019'].max(),
+    ))
     fig.update_geos(fitbounds="locations", visible=False)
-    fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0}, width=1000, height=400)
+    fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
 
     return fig
 
