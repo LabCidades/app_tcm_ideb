@@ -1,5 +1,6 @@
 import dash_html_components as html
 import dash_bootstrap_components as dbc
+import dash_core_components as dcc
 
 
 navbar = dbc.NavbarSimple(
@@ -32,13 +33,28 @@ collapse = html.Div(
             n_clicks=0,
         ),
         dbc.Collapse(
-            dbc.Card(dbc.CardBody('''O mapa de calor acima permite uma visualização da média do Ideb por Distrito da cidade de São Paulo.\n
-            Os dados do Ideb foram retirados diretamente do Inep e, a partir dele, calculamos uma média do Ideb das escolas de cada distrito para se chegar à média por Distrito.\n
-            Essa forma de visualizar as informações permite uma análise regionalizada desse indicador de aprendizagem.\n
-            O Ideb é um indicador de nível de aprendizagem usado no Ensino Fundamental, mas deve ser analisado levando-se em conta outros fatores como o Inse.\n
-            Para que tenhamos uma visão mais abrangente também vamos incluir em nossa plataforma e em nossas análises outros indicadores de aprendizagem que englobam características da comunidade e da escola como o Idep.''')),
-            id="collapse",
-            is_open=False,
+            dbc.Card(dbc.CardBody([
+                    html.P( 
+                     children=[
+                    '''Os dados acima refletem o ano de 2019 e
+                     foram extraídos dos indicadores educacionais do Inep, 
+                     disponíveis no portal ''',
+                     dcc.Link('Dados Abertos do Inep.', href = "https://www.gov.br/inep/pt-br/areas-de-atuacao/pesquisas-estatisticas-e-indicadores/ideb/resultados"),
+                     ]),
+                    html.P(children = ['''Foram extraídos os resultados por escolas da rede municipal de São Paulo
+                     e então foi feita a média desses dados por Distrito da cidade de São Paulo.
+                      Esses dados estão divididos entre Anos Iniciais e Anos Finais refletindo a forma 
+                      como são apresentados no Inep, sendo anos iniciais do 1º ao 4º ano e anos finais do
+                       5º ao 9º ano do Ensino fundamental.  Esses dados foram cruzados com os dados das 
+                       unidades educacionais da rede Municipal de Ensino de São Paulo disponíveis no ''',
+                       dcc.Link("Portal de Dados Abertos da Prefeitura Municipal de São Paulo.", href= "http://dados.prefeitura.sp.gov.br/dataset/cadastro-de-escolas-municipais-conveniadas-e-privadas")
+                    ]),
+                    html.P('''A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na figura. Alguns distritos não apresentam Ideb, pois não possuem escolas de Ensino Fundamental da Rede Municipal de Educação  (os alunos destes distritos frequentam escolas estaduais ou escolas em outros distritos.'''),
+            ],
+            ),
+            ),
+        id="collapse",
+        is_open=False
         ),
-    ]
+    ],
 )
