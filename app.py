@@ -57,8 +57,12 @@ app.layout = html.Div([
         {'label' : 'Anos iniciais', 'value' : 'iniciais'}],
         value='iniciais',
     ),
+    dbc.Card([
     dcc.Graph(id="choropleth"),
-    collapse
+    dbc.CardBody(
+    html.P('Os dados acima são de 2019, últimos dados disponíveis sobre o Ideb devido à pandemia. O mapa de calor acima permite uma visualização da média do Ideb por Distrito da cidade de São Paulo. Essa forma de visualizar as informações permite uma análise regionalizada desse indicador de aprendizagem. O Ideb é um indicador de nível de aprendizagem usado no Ensino Fundamental, mas deve ser analisado levando-se em conta outros fatores como o Inse. Para que tenhamos uma visão mais abrangente também vamos incluir em nossa plataforma e em nossas análises outros indicadores de aprendizagem que englobam características da comunidade e da escola como o Idep.')
+    ),
+    collapse]),
 ])
 
 @app.callback(
