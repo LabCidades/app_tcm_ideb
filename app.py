@@ -1,3 +1,6 @@
+
+#Copyright (C) 2020  Henrique Pougy/LabCidades Uninove
+
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
