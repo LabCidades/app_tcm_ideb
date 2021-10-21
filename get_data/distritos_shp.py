@@ -4,6 +4,9 @@ from zipfile import ZipFile
 from io import BytesIO
 import geopandas as gpd
 
+
+
+
 class DownloadShapeDists:
     
     url_distritos = ('http://download.geosampa.prefeitura.sp.gov.br/PaginasPublicas/'

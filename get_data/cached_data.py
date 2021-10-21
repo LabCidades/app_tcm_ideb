@@ -95,5 +95,18 @@ def distritos():
 
     return geodf
 
+def subprefeituras():
+
+    path_salvo = 'data/geo_data/SIRGAS_SHP_subprefeitura'
+    geodf = download_shape_salvo(path_salvo, 31983)
+
+    if geodf is not None:
+        print('Dados Subprefeituras shape cacheados.')
+        return geodf
+
+    download_distritos = DownloadShapeDists()
+    geodf = download_distritos()
+
+    return geodf
 
     
