@@ -18,6 +18,7 @@ import plotly.io as pio
 
 # Declarando o tema escuro para aplicar aos plots
 plotly_template = pio.templates["plotly_dark"]
+pio.templates.default = "plotly_dark"
 
 # Declarando o tema escuro que é aplicado na propriedades
 # Isso normalmente é aplicado após o app = dash.Dash(__name__)
@@ -26,10 +27,11 @@ colors = {
     'background': '#000000',
     'text': '#7FDBFF',
     'table_cell': '#111111',
-    'table_text': '#bebebe'
+    'table_text': '#bebebe',
+    'option_card_bg': '#222222',
+    'option_card_txt': '#77BBFF',
+    'white_text': '#FFFFFF'
 }
-
-pio.templates.default = "plotly_dark"
 
 dfDadosIdeb = obterIdeb.dadosIdeb('data/cadastro_ideb_merged.csv')
 dfDadosIdeb['ideb_2019'] = dfDadosIdeb['ideb_2019'].fillna(0)
@@ -37,22 +39,6 @@ dfDadosIdeb['coddist'] = dfDadosIdeb['coddist'].fillna(0)
 dfDadosIdeb['codsub'] = dfDadosIdeb['codsub'].fillna(0)
 
 totalEscolas = len(pd.unique(dfDadosIdeb["codigo_escola"]))
-
-# Chamando a planilha de opções do dropdown de educação e a colocando em uma variável
-dropdown_educ_location = 'data/dropdown_educacao.csv'
-lista_educacao = pd.read_csv(dropdown_educ_location)
-
-# Chamando a planilha de opções do dropdown de saude e a colocando em uma variável
-dropdown_saud_location = 'data/dropdown_saude.csv'
-lista_saude = pd.read_csv(dropdown_saud_location)
-
-# Chamando a planilha de opções do dropdown de urbanismo e a colocando em uma variável
-dropdown_urba_location = 'data/dropdown_urbanismo.csv'
-lista_urbanismo = pd.read_csv(dropdown_urba_location)
-
-# Chamando a planilha de opções do dropdown de orçamento e a colocando em uma variável
-dropdown_orca_location = 'data/dropdown_orcamento.csv'
-lista_orcamento = pd.read_csv(dropdown_orca_location)
 
 filt = (dfDadosIdeb["tipo_anos"] == "iniciais")
 df_filt = dfDadosIdeb[filt]
@@ -164,25 +150,8 @@ info_ideb = html.Div(id="divInfo", children = [
 # )
 #
 
-# Fazendo a lista de opções de educação se tormar funcional
-dropdown_educacao = [{'label': i, 'value': i} for i in lista_educacao['Indicador'].unique()]
-dropdown_educacao.insert(0, {'label': 'Escolha um indicador', 'value': 'Escolha um indicador'})
-print(dropdown_educacao)  # printando para testar
-
-# Fazendo a lista de opções de saúde se tormar funcional
-dropdown_saude = [{'label': i, 'value': i} for i in lista_saude['Indicador'].unique()]
-dropdown_saude.insert(0, {'label': 'Escolha um indicador', 'value': 'Escolha um indicador'})
-
-# Fazendo a lista de opções de urbanismo se tormar funcional
-dropdown_urbanismo = [{'label': i, 'value': i} for i in lista_urbanismo['Indicador'].unique()]
-dropdown_urbanismo.insert(0, {'label': 'Escolha um indicador', 'value': 'Escolha um indicador'})
-
-# Fazendo a lista de opções de orçamento se tormar funcional
-dropdown_orcamento = [{'label': i, 'value': i} for i in lista_orcamento['Indicador'].unique()]
-dropdown_orcamento.insert(0, {'label': 'Escolha um indicador', 'value': 'Escolha um indicador'})
-
 divdistritossubpreituras = dbc.Collapse(
-    dbc.Card(style={'backgroundColor': colors['background'], 'color': colors['text']}, children=[
+    dbc.Card(style={'backgroundColor': colors['option_card_bg'], 'color': colors['option_card_txt']}, children=[
     dbc.CardBody([
         html.H6("Dados", className="card-title"),
 
@@ -208,7 +177,7 @@ divdistritossubpreituras = dbc.Collapse(
 ], color="dark", outline=True), id="colapseddivistritossubpreituras", is_open=False)
 
 divdanos = dbc.Collapse(
-    dbc.Card(style={'backgroundColor': colors['background'], 'color': colors['text']}, children=[
+    dbc.Card(style={'backgroundColor': colors['option_card_bg'], 'color': colors['option_card_txt']}, children=[
     dbc.CardBody([
         html.H6("Anos", className="card-title"),
         dcc.RadioItems(id="optanos",
@@ -647,9 +616,12 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                 dbc.Collapse(
                     dcc.Dropdown(
                         id='dpEducacao',
-                        options=dropdown_educacao,
-                        value=[0],
-                        multi=False,
+                        options=[{'label': 'Ideb', 'value': 'ideb'},
+                             {'label': 'Universalização', 'value': 'unversalizacao'},
+                             {'label': 'Idep Inicias', 'value': 'idepiniciais'},
+                             {'label': ' Idep Finais', 'value': 'idepfinais'},
+                             {'label': 'Taxa de Abandono', 'value': 'abandono'},
+                             {'label': 'EJA', 'value': 'eja'}],
                         placeholder='Escolha um indicador',
                         style={'backgroundColor': colors['background'], 'color': colors['text']}),
                     id="colEducacao", is_open=False),
@@ -657,9 +629,9 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                 dbc.Collapse(
                     dcc.Dropdown(
                         id='dpSaude',
-                        options=dropdown_saude,
-                        value=[0],
-                        multi=False,
+                        options=[{'label': 'Saúde 1', 'value': 'saude1'},
+                                 {'label': 'Saúde 3', 'value': 'saude2'},
+                                 {'label': 'Saúde 3', 'value': 'saude3'}],
                         placeholder='Escolha um indicador'),
                         style={'backgroundColor': colors['background'], 'color': colors['text']},
                     id="colSaude", is_open=False),
@@ -667,9 +639,9 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                 dbc.Collapse(
                     dcc.Dropdown(
                         id='dpUurbanismo',
-                        options=dropdown_urbanismo,
-                        value=[0],
-                        multi=False,
+                        options=[{'label': 'Urbanismo 1', 'value': 'urbanismo1'},
+                                 {'label': 'Urbanismo 3', 'value': 'urbanismo2'},
+                                 {'label': 'Urbanismo 3', 'value': 'urbanismo3'}],
                         placeholder='Escolha um indicador'),
                         style={'backgroundColor': colors['background'], 'color': colors['text']},
                     id="colUrbanismo", is_open=False),
@@ -677,9 +649,9 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                 dbc.Collapse(
                     dcc.Dropdown(
                         id='dpOrcamento',
-                        options=dropdown_orcamento,
-                        value=[0],
-                        multi=False,
+                        options=[{'label': 'Orçamento 1', 'value': 'orcamento1'},
+                                 {'label': 'Orçamento 3', 'value': 'orcamento2'},
+                                 {'label': 'Orçamento 3', 'value': 'orcamento3'}],
                         placeholder='Escolha um indicador'),
                         style={'backgroundColor': colors['background'], 'color': colors['text']},
                     id="colOrcamento", is_open=False),
@@ -732,7 +704,7 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
 
             dbc.Collapse(
 
-                dbc.Card(style={'backgroundColor': colors['background'], 'color': colors['text']}, children=[
+                dbc.Card(style={'backgroundColor': colors['background'], 'color': colors['white_text']}, children=[
                     dbc.CardBody([
                         html.H6("Distritos", className="card-title"),
                         html.Div(style={'backgroundColor': colors['background'], 'color': colors['text']}, id="divTabelaDistrito", children=[
@@ -754,7 +726,7 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
 
             dbc.Collapse(
 
-                dbc.Card(style={'backgroundColor': colors['background'], 'color': colors['text']}, children=[
+                dbc.Card(style={'backgroundColor': colors['background'], 'color': colors['white_text']}, children=[
                     dbc.CardBody([
                         html.H6("Subprefeituras", className="card-title"),
                         html.Div(id="divTabelaSubprefeitura", children=[
