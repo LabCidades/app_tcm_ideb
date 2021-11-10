@@ -16,11 +16,13 @@ from get_data import get_data, get_distritos, get_subprefeituras, obterIdeb, obt
 import dash_table
 import plotly.io as pio
 
+### Para desativar modo escuro dos gráficos torne esta sessão em um comentário
 # Declarando o tema escuro para aplicar aos plots
 plotly_template = pio.templates["plotly_dark"]
 pio.templates.default = "plotly_dark"
+###
 
-# Declarando o tema escuro que é aplicado na propriedades
+# Declarando o tema escuro que é aplicado nas propriedades
 # Isso normalmente é aplicado após o app = dash.Dash(__name__)
 # Porém como há cards declarados em variáveis fora dele se fez necessário declarar ele aqui
 colors = {
@@ -30,8 +32,18 @@ colors = {
     'table_text': '#bebebe',
     'option_card_bg': '#222222',
     'option_card_txt': '#77BBFF',
-    'white_text': '#FFFFFF'
+    'topic_text': '#FFFFFF',
+    # 'background': '#FFFFFF',
+    # 'text': '#101010',
+    # 'table_cell': '#EFEFEF',
+    # 'table_text': '#111111',
+    # 'option_card_bg': '#DDDDDD',
+    # 'option_card_txt': '#010101',
+    # 'topic_text': '#000000'
 }
+# Para alternar entre modo claro e escuro torne a primeira parte comentário e descomente a segunda ou vice-versa
+# Não se esqueça de também de alterar o template dos gráficos próximo aos imports
+# Você pode opcionalmente alterar o stylesheet perto do app.layout para ficar com modo claro mais completo
 
 dfDadosIdeb = obterIdeb.dadosIdeb('data/cadastro_ideb_merged.csv')
 dfDadosIdeb['ideb_2019'] = dfDadosIdeb['ideb_2019'].fillna(0)
@@ -498,7 +510,9 @@ totais = gerar_texto()
 
 external_stylesheets = [dbc.themes.LUX]
 
-app = dash.Dash(__name__, external_stylesheets = [dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True)
+app = dash.Dash(__name__, external_stylesheets = [dbc.themes.CYBORG], suppress_callback_exceptions=True)
+# Para modo claro mude dbc.themes.* para BOOTSTRAP, modo escuro DARKLY ou SLATE e modo extra escuro mude para CYBORG
+
 
 server = app.server
 
@@ -704,7 +718,7 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
 
             dbc.Collapse(
 
-                dbc.Card(style={'backgroundColor': colors['background'], 'color': colors['white_text']}, children=[
+                dbc.Card(style={'backgroundColor': colors['background'], 'color': colors['topic_text']}, children=[
                     dbc.CardBody([
                         html.H6("Distritos", className="card-title"),
                         html.Div(style={'backgroundColor': colors['background'], 'color': colors['text']}, id="divTabelaDistrito", children=[
@@ -726,7 +740,7 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
 
             dbc.Collapse(
 
-                dbc.Card(style={'backgroundColor': colors['background'], 'color': colors['white_text']}, children=[
+                dbc.Card(style={'backgroundColor': colors['background'], 'color': colors['topic_text']}, children=[
                     dbc.CardBody([
                         html.H6("Subprefeituras", className="card-title"),
                         html.Div(id="divTabelaSubprefeitura", children=[
