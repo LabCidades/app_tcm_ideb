@@ -506,6 +506,10 @@ def gerar_mapa(tipografico, anos_ideb, tipodados):
 
     return fig
 
+def custom_legend_name(new_names):
+    for i, new_name in enumerate(new_names):
+        fig.data[i].name = new_name
+
 totais = gerar_texto()
 
 external_stylesheets = [dbc.themes.LUX]
@@ -1074,7 +1078,53 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                     info = "abandono"
                     info_header = "Indicador - Taxa de Abandono"
 
+########################################################################################################################
 
+                else:
+                    if indicadores == "unversalizacao":
+                        # labels = ['2015', '2016', '2017', '2018', '2019', '2020']
+                        # values = ['99,85%', '98,97%', '96,42%', '93,52%', '92,79%', '89,58%']
+
+                        dfLine = pd.read_excel("data/universalizacao_pre_escola.xlsx",
+                                               sheet_name="LINHA evol indic mun (15-20)")
+                        fig2 = px.line(dfLine, x="Indicador", y="Taxa",
+                                       title='Taxa de Universalização da Educação Infantil <br> (somente pré-escola) (%)')
+                        fig2.update_layout(yaxis_range=[88, 100], xaxis={'title': 'Ano'}, yaxis={'title': 'Taxa (%)'})
+
+
+                        # Esta função serve para customizar os nomes nas legendas de linha
+                        def custom_legend_name(new_names):
+                            for i, new_name in enumerate(new_names):
+                                fig3.data[i].name = new_name
+
+                        dfLine2 = pd.read_excel("data/universalizacao_pre_escola.xlsx",
+                                               sheet_name="LINHA evol. var mun (15-20)")
+                        fig3 = px.line(dfLine2, x="Indicador", y=["Matriculas", "Populacao"],
+                                       title='Taxa de Universalização da Educação Infantil <br> (somente pré-escola) (%)')
+                        custom_legend_name(['Matrículas<br>(todas as redes)', 'População<br>(4 e 5 anos)'])
+                        fig3.update_layout(yaxis_range=[280000, 350000], xaxis={'title': 'Ano'}, yaxis={'title': 'Taxa'},
+                                           legend=dict(orientation="h", yanchor="bottom", y=-0.4, xanchor="right", x=1),
+                                           legend_title_text='')
+
+                        # Referência
+                        # dfBarra = pd.read_excel("data/idep_barras_iniciais.xlsx")
+                        # fig = px.bar(dfBarra, y="Distrito", x=["Faixa 1", "Faixa 2", "Faixa 3", "Faixa 4", "Faixa 5", "Faixa 6"],
+                        #              orientation='h', title="Distribuição das escolas por faixa do Idep por Distrito (2019)",
+                        #              height=1200)
+
+
+
+                        divEsquerdaSup = {"display": "block"}
+                        divEsquerdaInf = {"display": "block"}
+                        divGrafDireita = {"display": "block"}
+                        divInfo = {"display": "block"}
+                        info = info_idep
+                        info_header = "Indicador - IDEP"
+                        card_Esquerda = True
+                        card_Direita = True
+                        card_Apresentacao_Direita = False
+
+########################################################################################################################
 
 
     else: #indicadores não escolhidos
