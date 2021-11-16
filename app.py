@@ -666,7 +666,7 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                              {'label': 'Taxa de Abandono', 'value': 'abandono'},
                              {'label': 'EJA', 'value': 'eja'}],
                         placeholder='Escolha um indicador',
-                        style={'backgroundColor': colors['background'], 'color': colors['text']}),
+                        style={'backgroundColor': colors['background']}),
                     id="colEducacao", is_open=False),
 
                 dbc.Collapse(
@@ -675,8 +675,8 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                         options=[{'label': 'Saúde 1', 'value': 'saude1'},
                                  {'label': 'Saúde 3', 'value': 'saude2'},
                                  {'label': 'Saúde 3', 'value': 'saude3'}],
-                        placeholder='Escolha um indicador'),
-                        style={'backgroundColor': colors['background'], 'color': colors['text']},
+                        placeholder='Escolha um indicador',
+                        style={'backgroundColor': colors['background']}),
                     id="colSaude", is_open=False),
 
                 dbc.Collapse(
@@ -685,8 +685,8 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                         options=[{'label': 'Urbanismo 1', 'value': 'urbanismo1'},
                                  {'label': 'Urbanismo 3', 'value': 'urbanismo2'},
                                  {'label': 'Urbanismo 3', 'value': 'urbanismo3'}],
-                        placeholder='Escolha um indicador'),
-                        style={'backgroundColor': colors['background'], 'color': colors['text']},
+                        placeholder='Escolha um indicador',
+                        style={'backgroundColor': colors['background']}),
                     id="colUrbanismo", is_open=False),
 
                 dbc.Collapse(
@@ -695,8 +695,8 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                         options=[{'label': 'Orçamento 1', 'value': 'orcamento1'},
                                  {'label': 'Orçamento 3', 'value': 'orcamento2'},
                                  {'label': 'Orçamento 3', 'value': 'orcamento3'}],
-                        placeholder='Escolha um indicador'),
-                        style={'backgroundColor': colors['background'], 'color': colors['text']},
+                        placeholder='Escolha um indicador',
+                        style={'backgroundColor': colors['background']}),
                     id="colOrcamento", is_open=False),
 
 ], md=9),
