@@ -1,10 +1,46 @@
-.VirtualizedSelectOption {
-    background-color: #111111;
-    color: white;
+/* caixa de input */
+.Select-control {
+    background-color: black;
 }
 
-.VirtualizedSelectFocusedOption {
-    background-color: gray;
-    font-size: 18px;
+
+/* texto da caixa de input */
+.Select-value-label {
+    color: white !important;
+}
+
+.Select--single > .Select-control .Select-value, .Select-placeholder {
+    border: 1px solid grey;
+    border-radius: 4px;
+}
+
+
+/* opções do menu de dropdown */
+.VirtualizedSelectOption {
+    background-color: black;
     color: white;
+ }
+
+
+/* efeito hover do menu de dropdown*/
+.VirtualizedSelectFocusedOption {
+    background-color: black;
+    opacity: .7;
+}
+
+
+/* foco da borda - padrão é blue
+ * sombra envolta da caixa de input.  padrão é blue
+ */
+.is-focused:not(.is-open) > .Select-control {
+  border-color: var(--primary); 
+  box-shadow: none;
+}
+
+
+
+
+/* isso colore o texto da caixa de input e x do multi dropdown*/
+.Select--multi .Select-value {
+  color: white;
 }

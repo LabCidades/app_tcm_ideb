@@ -615,6 +615,7 @@ loading_style = {'position': 'absolute', 'align-self': 'center'}
 app.layout = dbc.Container(style={'backgroundColor': colors['background']}, children=[
     dbc.Row([
         dbc.Col([
+            dbc.CardHeader(),
             dbc.Card(style={'backgroundColor': colors['background']}, children=[
                     dbc.CardBody([
                     html.H5(children="Observatório de Políticas Publicas - TCMSP",
@@ -788,10 +789,12 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
 
                     ])
                 ], color="dark", outline=True)
-                , id="colSubprefeitura", is_open=False)
+                , id="colSubprefeitura", is_open=False),
+            dbc.CardHeader()
 
         ], width=5),
         dbc.Col(style={'backgroundColor': colors['background'], 'color': colors['text']}, children=[
+            dbc.CardHeader(),
             dbc.Collapse(
 
                 dbc.Card(style={'backgroundColor': colors['background'], 'color': colors['text']}, children=[
@@ -830,15 +833,15 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
 
                     html.Div(id="divGrafDireita", children=[
                         dcc.Loading(id="Loading-1", type="default",
-                                    children=[dcc.Graph(id="choropleth")])
+                                    children=[dcc.Graph(id="choropleth"
+                                                        # , config={'fillFrame':True}
+                                                        )])
                     ]),
 
                 ])
                     ], color="dark", outline=True),
                     id = "colDireita", is_open = False),
-
             dbc.Collapse(
-
                 dbc.Card(style={'backgroundColor': colors['background'], 'color': colors['text']}, children=[
                     dbc.CardImg(src="./assets/mapa_transparente.png", top=True),
                     dbc.CardBody([
@@ -854,6 +857,7 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                     ])
                 ], color="dark", outline=True)
                 , id="colApresentacaoDireita", is_open=True),
+                dbc.CardHeader(),
 
 ], width=7)
 ], no_gutters=False)
@@ -1043,7 +1047,8 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                 fig2.update_layout(margin=dict(l=0, r=0, t=50, b=0), autosize=True,  title="Percentual de escolas por faixa do IDEP <br> Anos Iniciais (2019)")
 
                 dfBarra = pd.read_excel("data/idep_barras_iniciais.xlsx")
-                fig = px.bar(dfBarra, y="Distrito", x=["Faixa 1","Faixa 2","Faixa 3","Faixa 4","Faixa 5","Faixa 6"], orientation='h', title="Distribuição das escolas por faixa do Idep por Distrito (2019)", height=1200)
+                fig = px.bar(dfBarra, y="Distrito", x=["Faixa 1", "Faixa 2", "Faixa 3", "Faixa 4", "Faixa 5", "Faixa 6"], orientation='h', title="Distribuição das escolas por faixa do Idep por Distrito (2019)", height=1200)
+                fig.update_layout(font_size=10, yaxis={'categoryorder': 'category descending'})
 
 
                 labels = ['Não Atingiram', 'Atingiram']
@@ -1067,10 +1072,10 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                     df = pd.read_excel("data/evasao_linha.xlsx")
 
                     fig2.add_trace(go.Scatter(
-                        x=df.Ano, y=df.taxa, mode="markers", line_shape='linear',
+                        x=df.Ano, y=df.taxa, mode="markers+lines", line_shape='linear',
                         marker_color=df.taxa, text=df.Ano, marker=dict(showscale=True)
                     ))
-                    fig2.update_traces(marker_line_width=2, marker_size=10)
+                    fig2.update_traces(marker_line_width=5, marker_size=10)
 
                     datah = [go.Scatter(x=df["Ano"], y=df["taxa"], hoverinfo="none", hovertext="")]
 
@@ -1131,6 +1136,7 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                         fig2.update_layout(yaxis_range=[88, 100],
                                            xaxis={'title': 'Ano'},
                                            yaxis={'title': 'Taxa (%)'})
+                        fig2.update_traces(mode="markers+lines")
 
                         dfLine2 = pd.read_excel("data/universalizacao_pre_escola_linha_15-20.xlsx",
                                                 sheet_name="LINHA evol. var mun (15-20)")
@@ -1147,6 +1153,7 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                                        y=-0.4, xanchor="right",
                                                        x=1),
                                            legend_title_text='')
+                        fig3.update_traces(mode="markers+lines")
 
                         divEsquerdaSup = {"display": "block"}
                         divEsquerdaInf = {"display": "block"}
