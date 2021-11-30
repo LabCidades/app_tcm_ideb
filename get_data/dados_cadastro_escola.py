@@ -3,13 +3,14 @@ import pandas as pd
 import os
 from .dados_abertos import DadosAbertos
 
+
 class DadosCadastroEscola:
     
     url = ('http://dados.prefeitura.sp.gov.br/pt_PT/'
-            'dataset/cadastro-de-escolas-municipais-conveniadas-e-privadas')
-    extensoes= ('csv',)
+           'dataset/cadastro-de-escolas-municipais-conveniadas-e-privadas')
+    extensoes = ('csv',)
 
-    path_salvar =  'raw_data/cadastro_2019/'
+    path_salvar = 'raw_data/cadastro_2019/'
     
     def __init__(self):
         
@@ -56,7 +57,3 @@ class DadosCadastroEscola:
             self.salvar_dados(df, sep)
         
         return df
-
-
-
-        

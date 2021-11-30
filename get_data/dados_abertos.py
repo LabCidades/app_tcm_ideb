@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 
 class DadosAbertos:
     '''
-    Callable que retorna um generator contendo o conteudo dos recursos 
+    Callable que retorna um generator contendo o conteudo dos recursos
     disponíveis para um determinado conjunto no Portal de Dados Abertos da PMSP.
     
     url_cojunto: str, url de acesso do conjunto de dados no Portal de Dados Abertos
@@ -82,7 +82,6 @@ class DadosAbertos:
         
         return parsed_data
 
-                
     def check_if_text_download(self, recurso_parsed):
         
         extensao = recurso_parsed['extensao']

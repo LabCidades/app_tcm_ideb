@@ -5,14 +5,12 @@ from io import BytesIO
 import geopandas as gpd
 
 
-
-
 class DownloadShapeDists:
     
     url_distritos = ('http://download.geosampa.prefeitura.sp.gov.br/PaginasPublicas/'
-                'downloadArquivo.aspx?orig=DownloadCamadas&'
-                'arq=01_Limites%20Administrativos%5C%5CDistrito%5C%5CShapefile%5C%5CSIRGAS_SHP_distrito&arqTipo=Shapefile')
-    
+                     'downloadArquivo.aspx?orig=DownloadCamadas&'
+                     'arq=01_Limites%20Administrativos%5C%5CDistrito%5C%5CShapefile%5C%5CSIRGAS_SHP_distrito&arqTipo=Shapefile')
+
     path_dados = 'data/geo_data'
     
     def download(self):
@@ -45,7 +43,7 @@ class DownloadShapeDists:
 
         geodf = gpd.read_file(path_file)
 
-        geodf.set_crs(epsg = 31983, inplace=True)
+        geodf.set_crs(epsg=31983, inplace=True)
 
         return geodf
         

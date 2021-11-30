@@ -13,4 +13,3 @@ def dadosIdeb(path_salvo):
         print('Dados Ideb carregados.')
 
     return df
-

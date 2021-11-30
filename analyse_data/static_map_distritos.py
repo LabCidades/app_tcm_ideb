@@ -8,11 +8,11 @@ class StaticMapMakerIdeb:
     def solve_dados_distrito(self, dados_por_distrito=None, tipo_ideb=None):
 
         if dados_por_distrito is None:
-                if tipo_ideb not in ('iniciais', 'finais'):
-                    raise ValueError(f'''If dados_por_distrito is None must specify tipo_distrito.
-                                    Accepted values are: "finais" or "iniciais"''')
+            if tipo_ideb not in ('iniciais', 'finais'):
+                raise ValueError(f'''If dados_por_distrito is None must specify tipo_distrito.
+                                 Accepted values are: "finais" or "iniciais"''')
                 regionalizar = RegionalizarDistritos()
-                dados_por_distrito = regionalizar(tipo_ideb)
+            dados_por_distrito = regionalizar(tipo_ideb)
         
         return dados_por_distrito
 
@@ -31,7 +31,6 @@ class StaticMapMakerIdeb:
 
         return title
 
-
     def gerar_mapa_estatico(self, dados_por_distrito=None, tipo_ideb=None):
 
         dados_por_distrito = self.solve_dados_distrito(dados_por_distrito, tipo_ideb)
@@ -39,10 +38,10 @@ class StaticMapMakerIdeb:
         titulo_mapa = self.gerar_title(tipo_ideb)
 
         fig, ax = plt.subplots()
-        fig.set_size_inches(8.27, 11.69) #A4 Portrait
-        ax =dados_por_distrito.plot(ax=ax, column='ideb_2019', legend=True, 
-                    legend_kwds={'label': "Ideb médio",'orientation': "vertical"}, cmap='Reds',
-                    alpha=0.5, edgecolor='k')
+        fig.set_size_inches(8.27, 11.69)  # A4 Portrait
+        ax = dados_por_distrito.plot(ax=ax, column='ideb_2019', legend=True,
+                                     legend_kwds={'label': "Ideb médio", 'orientation': "vertical"}, cmap='Reds',
+                                     alpha=0.5, edgecolor='k')
         ax.set_title(titulo_mapa, size=20)
         ax.set_yticklabels([])
         ax.set_xticklabels([])
