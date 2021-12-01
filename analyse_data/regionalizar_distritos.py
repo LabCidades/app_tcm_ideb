@@ -2,6 +2,7 @@ import pandas as pd
 import get_data as gpd
 from get_data import get_data, get_distritos, get_subprefeituras
 
+
 class RegionalizarDistritos:
 
     def agrupar_distritos_media(self, microdados_ideb):
@@ -31,7 +32,6 @@ class RegionalizarDistritos:
 
         df_anos.to_csv("df_anos.csv")
 
-
         return df_anos
 
     def padronizar_codigo_subprefeitura_ideb(self, df_anos):
@@ -40,7 +40,6 @@ class RegionalizarDistritos:
 
         df_anos.to_csv("df_anos.csv")
 
-
         return df_anos
 
     def merge_shapefile(self, df_anos, distritos):
@@ -48,20 +47,18 @@ class RegionalizarDistritos:
         df_anos = self.padronizar_codigo_distrito_ideb(df_anos)
 
         merged = pd.merge(distritos, df_anos, 
-                    how='left', left_on='ds_codigo', right_on='coddist')
+                          how='left', left_on='ds_codigo', right_on='coddist')
 
         return merged
-
 
     def merge_shapefile_sub(self, df_anos, subprefeituras):
 
         df_anos = self.padronizar_codigo_subprefeitura_ideb(df_anos)
 
         merged = pd.merge(subprefeituras, df_anos,
-                    how='left', left_on='sp_id', right_on='codsub')
+                          how='left', left_on='sp_id', right_on='codsub')
 
         return merged
-
 
     def __call__(self, tipo_anos, microdados_ideb=None, distritos=None, subprefeituras=None):
 

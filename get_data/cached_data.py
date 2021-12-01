@@ -6,22 +6,24 @@ from .parse_ideb import DataIdebFinais, DataIdebIniciais
 from .merge_cadastro_ideb import JoinData
 from .distritos_shp import DownloadShapeDists
 
+
 def download_df_salvo(path_salvo):
     
     if os.path.exists(path_salvo):
         df = pd.read_csv(path_salvo, sep=';')
         if "Unnamed: 0" in df:
-            df.drop("Unnamed: 0",axis=1,inplace=True)
+            df.drop("Unnamed: 0", axis=1, inplace=True)
         return df
     return None
+
 
 def download_shape_salvo(path_salvo, epsg):
 
     if os.path.exists(path_salvo):
         geodf = gpd.read_file(path_salvo)
         if "Unnamed: 0" in geodf:
-            geodf.drop("Unnamed: 0",axis=1,inplace=True)
-        geodf.set_crs(epsg = epsg, inplace=True)
+            geodf.drop("Unnamed: 0", axis=1, inplace=True)
+        geodf.set_crs(epsg=epsg, inplace=True)
         return geodf
     return None
 
@@ -39,6 +41,7 @@ def ideb_finais():
     
     return finais.data
 
+
 def ideb_iniciais():
     
     path_salvo = 'raw_data/ideb_parsed/dados_ideb_iniciais.csv'
@@ -52,6 +55,7 @@ def ideb_iniciais():
     
     return iniciais.data
 
+
 def cadastro_2019():
 
     path_salvo = 'raw_data/cadastro_2019/cadastro_2019.csv'
@@ -64,6 +68,7 @@ def cadastro_2019():
     cadastro_2019 = pegar_cadastro.dataframe_ano(2019)
     
     return cadastro_2019 
+
 
 def merged_data():
 
@@ -82,6 +87,7 @@ def merged_data():
 
     return df
 
+
 def distritos():
 
     path_salvo = 'data/geo_data/SIRGAS_SHP_distrito'
@@ -94,6 +100,7 @@ def distritos():
     geodf = download_distritos()
 
     return geodf
+
 
 def subprefeituras():
 

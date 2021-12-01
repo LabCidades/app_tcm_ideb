@@ -4,13 +4,13 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 import pandas as pd
-import geopandas as gpd
+# import geopandas as gpd
 import plotly.express as px
 import plotly.graph_objects as go
 import json
-from front_end import navbar, collapse
-from analyse_data.regionalizar_distritos import RegionalizarDistritos
-from get_data import get_data, get_distritos, get_subprefeituras, obterIdeb, obterDistritos, obterSubprefeituras
+# from front_end import navbar, collapse
+# from analyse_data.regionalizar_distritos import RegionalizarDistritos
+from get_data import obterIdeb, obterDistritos  # , obterSubprefeituras, get_data, get_distritos, get_subprefeituras
 
 dfDadosIdeb = obterIdeb.dadosIdeb('data/cadastro_ideb_merged.csv')
 dfDadosIdeb['ideb_2019'] = dfDadosIdeb['ideb_2019'].fillna(0)
@@ -35,11 +35,11 @@ geojson = px.data.election_geojson()
 candidates = df.winner.unique()
 
 
-dfjson = json.load(open('c:\\c2\\myshpfile.geojson','r'))
+dfjson = json.load(open('c:\\c2\\myshpfile.geojson', 'r'))
 
-geojson1=json.loads(dfDadosDistritos.geometry.to_json())
+geojson1 = json.loads(dfDadosDistritos.geometry.to_json())
 
-app = dash.Dash(__name__, external_stylesheets = [dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True)
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True)
 
 
 app.layout = dbc.Container(children=[
@@ -53,23 +53,24 @@ app.layout = dbc.Container(children=[
 
         dbc.Col([
 
-    html.Div([
-    html.P("Candidate:"),
-    dcc.RadioItems(
-        id='candidate',
-        options=[{'value': x, 'label': x}
-                 for x in candidates],
-        value=candidates[0],
-        labelStyle={'display': 'inline-block'}
-    ),
-    dcc.Graph(id="choropleth"),
-])
+            html.Div([
+                html.P("Candidate:"),
+                dcc.RadioItems(
+                    id='candidate',
+                    options=[{'value': x, 'label': x}
+                             for x in candidates],
+                    value=candidates[0],
+                    labelStyle={'display': 'inline-block'}
+                ),
+                dcc.Graph(id="choropleth"),
+            ])
 
         ], md=8)
 
     ])
 
 ])
+
 
 @app.callback(
     Output("choropleth", "figure"),
@@ -79,7 +80,7 @@ def display_choropleth(candidate):
     geodf = dfDadosDistritos
     geodf['geometry'] = geodf['geometry'].to_crs(epsg=4669)
     geodf['text'] = geodf['ds_nome'] + ':<br>Nota média:' \
-                    + geodf[anos_ideb].apply(
+        + geodf[anos_ideb].apply(
         lambda x: str(round(x, 2)) if not x == 0 else 'Não se aplica')
 
     min_ideb = geodf[anos_ideb].min()
@@ -99,5 +100,6 @@ def display_choropleth(candidate):
     fig.update_layout(margin=dict(l=0, r=0, t=0, b=0), showlegend=True, height=500)
 
     return fig
+
 
 app.run_server(debug=True)

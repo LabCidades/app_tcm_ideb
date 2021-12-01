@@ -5,7 +5,7 @@ import pandas as pd
 def dadosIdeb(path_salvo):
 
     if os.path.exists(path_salvo):
-        df = pd.read_csv(path_salvo, sep=';')
+        df = pd.read_csv(path_salvo, encoding='latin-1', sep=';')
         if "Unnamed: 0" in df:
             df.drop("Unnamed: 0", axis=1, inplace=True)
 
@@ -13,4 +13,3 @@ def dadosIdeb(path_salvo):
         print('Dados Ideb carregados.')
 
     return df
-

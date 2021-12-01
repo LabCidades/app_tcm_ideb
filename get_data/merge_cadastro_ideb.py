@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import os
 
+
 class IdebCleaner:
 
     def nan_col_ideb(self, df):
@@ -21,7 +22,7 @@ class IdebCleaner:
     def filtrar_municipio_sp(self, df):
 
         codigo_sampa = 3550308
-        filtro = df['codigo_municipio']==codigo_sampa
+        filtro = df['codigo_municipio'] == codigo_sampa
 
         return df[filtro].copy().reset_index(drop=True)
     
@@ -29,7 +30,7 @@ class IdebCleaner:
         
         dropar = ['codigo_municipio', 'tipo_rede']
         
-        df = df.drop(dropar, axis = 1).copy()
+        df = df.drop(dropar, axis=1).copy()
         
         return df
     
@@ -52,7 +53,8 @@ class IdebCleaner:
     def __call__(self, df):
         
         return self.clean_ideb(df)
-    
+
+
 class CadastroCleaner:
     
     def limpar_codinep(self, cadastro):
@@ -77,8 +79,7 @@ class CadastroCleaner:
         cadastro = cadastro[cols_uteis].copy()
         
         return cadastro
-    
-    
+
     def __call__(self, cadastro):
         
         cadastro = self.limpar_codinep(cadastro)
@@ -94,8 +95,7 @@ class JoinData:
         
         self.clean_ideb = IdebCleaner()
         self.clean_cadastro = CadastroCleaner()
-        
-    
+
     def clean_data(self, cadastro, ideb_inicias, ideb_finais):
         
         ideb_inicias = self.clean_ideb(ideb_inicias)
@@ -107,17 +107,16 @@ class JoinData:
     def join_ideb(self, ideb_iniciais, ideb_finais):
         
         joined = pd.concat([ideb_iniciais, ideb_finais])
-        #for some reason it's casting int when joining
+        # for some reason it's casting int when joining
         joined['codigo_escola'] = joined['codigo_escola'].astype(str)
         
         return joined
     
     def merge_ideb_cadastro(self, ideb_geral, cadastro):
-        
-        
+
         merged = pd.merge(ideb_geral, cadastro, 
                           how='left', left_on='codigo_escola', 
-                          right_on = 'codinep')
+                          right_on='codinep')
         
         return merged
 
@@ -127,11 +126,10 @@ class JoinData:
             os.mkdir(path)
         
         df.to_csv(os.path.join(path, 'cadastro_ideb_merged.csv'), index=False,
-                    sep=';')
+                  sep=';')
         print('Dados merged ideb e cadastrais salvos com sucesso')
     
     def __call__(self, cadastro, ideb_inicias, ideb_finais, path_salvar=None):
-        
         
         cadastro, iniciais, finais = self.clean_data(
                                                     cadastro, 
@@ -144,5 +142,3 @@ class JoinData:
             self.save_joined_df(merged, path_salvar)
         
         return merged
-    
-

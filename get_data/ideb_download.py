@@ -3,6 +3,7 @@ from zipfile import ZipFile
 from io import BytesIO
 import os
 
+
 class IdebDownload:
     
     root_url = 'https://download.inep.gov.br/educacao_basica/portal_ideb/planilhas_para_download/2019/'
@@ -53,7 +54,7 @@ class IdebDownload:
     
     def __call__(self, tipo='all'):
 
-        if tipo =='all':
+        if tipo == 'all':
         
             self.download_and_unzip_inicias()
             print('Anos iniciais Ideb baixados com sucesso')
