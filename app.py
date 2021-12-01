@@ -241,6 +241,11 @@ divAnosUnersalizacao = dbc.Collapse(
 
 
 def gerar_geodf(anos_ideb):
+    """Gera o GeoDataFrame de anos_ideb de acordo com os anos escolhidos e
+    retorna um GeoDataFrame.
+
+    Variable type: String
+    Options: 'todos' ou 'iniciais'"""
 
     if anos_ideb == "todos":
         pass
@@ -267,6 +272,16 @@ def gerar_geodf(anos_ideb):
 
 
 def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
+    """Gera o mapa Choropleth de acordo com os parâmetros passados e
+    retorna uma fig.
+
+    Variable type:{tipografico: String;
+                        tipodados: String;
+                        anos_universalizacao: int}
+
+    Options:{tipografico: 'ideb', 'univerzalizacao' ou 'gastos'
+                tipodados: 'distritos' ou 'subprefeituras'
+                anos_universalizacao: 2019}"""
 
     fig = go.Figure()
 
@@ -296,7 +311,8 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
             fig.update_layout(margin={"r": 0, "t": 50, "l": 0, "b": 0},
                               showlegend=False,
                               height=513,
-                              title="Distribuição IDEB por Distritos")
+                              title="Distribuição IDEB por Distritos",
+                              mapbox_style="open-street-map")
 
         else:
             if tipodados == "subprefeitura":
@@ -829,6 +845,11 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                Input('btn-orcamento', 'n_clicks')]
              )
 def displayClick(btn1, btn2, btn3, btn4):
+    """Torna os botões da aplicação interativos retornando os dropdowns
+    que aparecem ao clicar neles.
+
+    Variable type: none"""
+
     changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
 
     m_dropdown_educacao = False
@@ -883,6 +904,13 @@ def displayClick(btn1, btn2, btn3, btn4):
               Input("sliderEja", "value")
               )
 def displayMapa(indicadores_educacao, indicadores_orcamento, dados, anos, anos_universalizacao, sliderEja):
+    """Exibe os mapas e/ou gráficos gerados de acordo com os botões clicados, retornando
+    as figuras de acordo.
+
+    Variable type: String
+
+    Options: 'ideb', 'idep', 'abandono', 'universalizacao', 'gastos' ou 'eja'"""
+
     user_click = dash.callback_context.triggered[0]['prop_id'].split('.')[0]
     colapseddivistritossubpreituras = False
     collapsedivdanos = False
@@ -1201,6 +1229,8 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
 
 
 def toggle_modal(n1, n2, is_open):
+    """(Função obsoleta) Sobe uma tela de info"""
+
     if n1 or n2:
         return not is_open
     return is_open
