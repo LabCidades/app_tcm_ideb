@@ -8,6 +8,7 @@ from .distritos_shp import DownloadShapeDists
 
 
 def download_df_salvo(path_salvo):
+    """Cria um DataFrame com base no caminho salvo para um csv, retornando um df"""
     
     if os.path.exists(path_salvo):
         df = pd.read_csv(path_salvo, sep=';')
@@ -18,6 +19,7 @@ def download_df_salvo(path_salvo):
 
 
 def download_shape_salvo(path_salvo, epsg):
+    """Cria um GeoDataFrame com base no caminho salvo para um csv, retornando um geodf"""
 
     if os.path.exists(path_salvo):
         geodf = gpd.read_file(path_salvo)
@@ -29,6 +31,7 @@ def download_shape_salvo(path_salvo, epsg):
 
 
 def ideb_finais():
+    """Cria um DataFrame com base no caminho salvo para o ideb_finais, retornando um df e finais"""
     
     path_salvo = 'raw_data/ideb_parsed/dados_ideb_finais.csv'
     df = download_df_salvo(path_salvo)
@@ -43,6 +46,7 @@ def ideb_finais():
 
 
 def ideb_iniciais():
+    """Cria um DataFrame com base no caminho salvo para o ideb_inicias, retornando um df e iniciais"""
     
     path_salvo = 'raw_data/ideb_parsed/dados_ideb_iniciais.csv'
     df = download_df_salvo(path_salvo)
@@ -57,6 +61,7 @@ def ideb_iniciais():
 
 
 def cadastro_2019():
+    """Cria um DataFrame com base no caminho salvo para o cadastro_2019, retornando um df e cadastro_2019"""
 
     path_salvo = 'raw_data/cadastro_2019/cadastro_2019.csv'
     df = download_df_salvo(path_salvo)
@@ -71,6 +76,8 @@ def cadastro_2019():
 
 
 def merged_data():
+    """Cria um DataFrame com base no caminho salvo para o cadastro_ideb_merged,
+    então faz um merge do iniciais, finais e cadastro e retorna um df"""
 
     path_salvo = 'data/cadastro_ideb_merged.csv'
     df = download_df_salvo(path_salvo)
@@ -89,6 +96,7 @@ def merged_data():
 
 
 def distritos():
+    """Gera um GeoDataFrame com base no caminho salvo dos dados geométricos dos distritos"""
 
     path_salvo = 'data/geo_data/SIRGAS_SHP_distrito'
     geodf = download_shape_salvo(path_salvo, 31983)
@@ -103,6 +111,7 @@ def distritos():
 
 
 def subprefeituras():
+    """Gera um GeoDataFrame com base no caminho salvo dos dados geométricos das subprefeituras"""
 
     path_salvo = 'data/geo_data/SIRGAS_SHP_subprefeitura'
     geodf = download_shape_salvo(path_salvo, 31983)

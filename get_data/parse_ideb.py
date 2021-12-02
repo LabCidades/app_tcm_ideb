@@ -7,6 +7,7 @@ from .ideb_download import IdebDownload
 class ParseIdeb:
     
     def __init__(self, filename, sheet_name, row_ini, row_fim, columns, tipo):
+        """Inicia a identificação dos dados ParseIdeb"""
         
         self.download = IdebDownload()
         self.filename = filename
@@ -17,11 +18,13 @@ class ParseIdeb:
         self.tipo = tipo
 
     def download_data_if_needs(self, filename, tipo):
+        """Baixa os dados se necessário"""
 
         if not os.path.exists(filename):
             self.download(tipo=tipo)
         
     def load_wb(self, filename, tipo):
+        """Carrega o workbook e retorna ele como wb"""
         
         self.download_data_if_needs(filename, tipo)
         wb = load_workbook(filename)
@@ -29,10 +32,12 @@ class ParseIdeb:
         return wb
     
     def get_sheet(self, wb, sheet_name):
+        """Identifica a folha da planilha do wb"""
         
         return wb[sheet_name]
     
     def parse_data(self, sheet, row_ini, row_fim, columns):
+        """Parseia os dados passados no workbook e atribui eles a um pandas DataFrame"""
         
         dados = []
         range_dados = range(row_ini, row_fim)
@@ -46,6 +51,7 @@ class ParseIdeb:
         return pd.DataFrame(dados)
     
     def __call__(self):
+        """Chama a si mesmo, carregando, identificando a folha e parseando os dados do workbook e retornando data"""
         
         wb = self.load_wb(self.filename, self.tipo)
         sheet = self.get_sheet(wb, self.sheet_name)
@@ -124,6 +130,7 @@ class DataIdebFinais:
     row_fim = 45176
     
     def __init__(self):
+        """Inicia a identificação dos dados IdebFinais"""
         
         self.parser = ParseIdeb(self.filename, 
                                 self.sheet,
@@ -137,10 +144,12 @@ class DataIdebFinais:
     
     @property
     def data(self):
+        """Retorna os dados"""
         
         return self.__data
 
     def save_data(self):
+        """Salva os dados em um CSV dados_ideb_finais"""
 
         df = self.__data
 
