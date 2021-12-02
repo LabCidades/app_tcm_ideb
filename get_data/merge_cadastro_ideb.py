@@ -97,6 +97,7 @@ class JoinData:
         self.clean_cadastro = CadastroCleaner()
 
     def clean_data(self, cadastro, ideb_inicias, ideb_finais):
+        """Limpa os dados de cadastro ideb_inicias e ideb_finais"""
         
         ideb_inicias = self.clean_ideb(ideb_inicias)
         ideb_finais = self.clean_ideb(ideb_finais)
@@ -105,6 +106,7 @@ class JoinData:
         return cadastro, ideb_inicias, ideb_finais
         
     def join_ideb(self, ideb_iniciais, ideb_finais):
+        """Faz o join do ideb iniciais com o finais e retorna o joined"""
         
         joined = pd.concat([ideb_iniciais, ideb_finais])
         # for some reason it's casting int when joining
@@ -113,6 +115,7 @@ class JoinData:
         return joined
     
     def merge_ideb_cadastro(self, ideb_geral, cadastro):
+        """Faz o merge do ideb geral com cadastro e retorna o merged"""
 
         merged = pd.merge(ideb_geral, cadastro, 
                           how='left', left_on='codigo_escola', 
@@ -121,6 +124,7 @@ class JoinData:
         return merged
 
     def save_joined_df(self, df, path='data'):
+        """Salva caminho dos dados mergidos em cadastro_ideb_merged.csv"""
 
         if not os.path.exists(path):
             os.mkdir(path)
@@ -130,6 +134,7 @@ class JoinData:
         print('Dados merged ideb e cadastrais salvos com sucesso')
     
     def __call__(self, cadastro, ideb_inicias, ideb_finais, path_salvar=None):
+        """Chama a si mesmo, relizando a limpeza, join e merge de cadastro, ideb_inicias e ideb_finais"""
         
         cadastro, iniciais, finais = self.clean_data(
                                                     cadastro, 

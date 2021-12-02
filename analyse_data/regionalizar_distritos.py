@@ -6,18 +6,25 @@ from get_data import get_data, get_distritos, get_subprefeituras
 class RegionalizarDistritos:
 
     def agrupar_distritos_media(self, microdados_ideb):
+        """(Possivelmente obsoleta) Agrupando os dados dos distritos através da média,
+        retornando um dataframe grouped"""
 
         grouped = microdados_ideb.groupby(['tipo_anos', 'coddist'])[['ideb_2019']].mean()
 
         return grouped
 
     def agrupar_subprefeituras_media(self, microdados_ideb):
+        """(Possivelmente obsoleta) Agrupando os dados das subprefeituras através da média
+        retornando um dataframe grouped"""
 
         grouped = microdados_ideb.groupby(['tipo_anos', 'codsub'])[['ideb_2019']].mean()
 
         return grouped
 
     def filtrar_tipo_anos(self, grouped, tipo_anos):
+        """(Possivelmente obsoleta) fazendo a filtragem de dados de acordo com o tipo de anos (iniciais ou finais)
+        retornando um dataframe df_anos"""
+
 
         if tipo_anos not in ('finais', 'iniciais'):
             raise ValueError(f'Tipo de anos {tipo_anos} não existente')
@@ -27,6 +34,7 @@ class RegionalizarDistritos:
         return df_anos
 
     def padronizar_codigo_distrito_ideb(self, df_anos):
+        """Padronizando os distritos do df_anos de acordo com o código do distrito"""
 
         df_anos['coddist'] = df_anos['coddist'].astype(int).astype(str)
 
@@ -35,6 +43,7 @@ class RegionalizarDistritos:
         return df_anos
 
     def padronizar_codigo_subprefeitura_ideb(self, df_anos):
+        """Padronizando as subprefeituras do df_anos de acordo com o código da subprefeitura"""
 
         df_anos['codsub'] = df_anos['codsub'].astype(int).astype(str)
 
@@ -43,6 +52,7 @@ class RegionalizarDistritos:
         return df_anos
 
     def merge_shapefile(self, df_anos, distritos):
+        """Fazendo merge dos DataFrames distritos e df_anos através de seus códigos"""
 
         df_anos = self.padronizar_codigo_distrito_ideb(df_anos)
 
@@ -52,6 +62,7 @@ class RegionalizarDistritos:
         return merged
 
     def merge_shapefile_sub(self, df_anos, subprefeituras):
+        """Fazendo merge dos DataFrames subprefeituras e df_anos através de seus códigos"""
 
         df_anos = self.padronizar_codigo_subprefeitura_ideb(df_anos)
 
@@ -61,6 +72,7 @@ class RegionalizarDistritos:
         return merged
 
     def __call__(self, tipo_anos, microdados_ideb=None, distritos=None, subprefeituras=None):
+        """Agrupando os dados para mergir o shapefile"""
 
         if tipo_anos not in ('finais', 'iniciais'):
             raise ValueError(f'Tipo de anos {tipo_anos} não existente')

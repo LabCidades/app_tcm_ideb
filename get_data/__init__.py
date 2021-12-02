@@ -3,6 +3,7 @@ from .merge_cadastro_ideb import JoinData
 
 
 def get_data():
+    """Atribui os dados mergidos a um DataFrame e retorna ele como df"""
 
     df = merged_data()
 
@@ -10,6 +11,7 @@ def get_data():
 
 
 def get_distritos():
+    """Atribui os dados dos distritos a um DataFrame e retorna ele como geodf"""
 
     geodf = distritos()
 
@@ -17,6 +19,7 @@ def get_distritos():
 
 
 def get_subprefeituras():
+    """Atribui os dados das subprefeituras a um DataFrame e retorna ele como geodf"""
 
     geodf = subprefeituras()
 

@@ -6,6 +6,7 @@ from get_data import get_distritos
 class StaticMapMakerIdeb:
 
     def solve_dados_distrito(self, dados_por_distrito=None, tipo_ideb=None):
+        """Regionalizando ideb por distrito de acordo com seu tipo"""
 
         if dados_por_distrito is None:
             if tipo_ideb not in ('iniciais', 'finais'):
@@ -17,12 +18,14 @@ class StaticMapMakerIdeb:
         return dados_por_distrito
 
     def get_limites_distritos(self):
+        """Pega os dados geométricos das fronteiras dos distritos"""
 
         boundary_distritos = get_distritos()['geometry'].boundary
 
         return boundary_distritos
 
     def gerar_title(self, tipo_ideb):
+        """Cria um titulo"""
 
         if tipo_ideb is None:
             return f'Ideb Médio por Distrito'
@@ -32,6 +35,7 @@ class StaticMapMakerIdeb:
         return title
 
     def gerar_mapa_estatico(self, dados_por_distrito=None, tipo_ideb=None):
+        """Gera um mapa estático do ideb médio por distrito"""
 
         dados_por_distrito = self.solve_dados_distrito(dados_por_distrito, tipo_ideb)
         limites = self.get_limites_distritos()
@@ -52,6 +56,7 @@ class StaticMapMakerIdeb:
         return ax
 
     def __call__(self, tipo_ideb):
+        """Roda o programa que gera o mapa estático"""
 
         return self.gerar_mapa_estatico(tipo_ideb=tipo_ideb)
 

@@ -5,7 +5,7 @@ import dash
 import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 import dash_html_components as html
-from dash_table.Format import Format, Scheme, Group  # Symbol
+from dash_table.Format import Format, Scheme, Group  # , Symbol
 from dash.dependencies import Input, Output, State
 import plotly.graph_objects as go
 import plotly.express as px
@@ -13,7 +13,7 @@ import json
 import pandas as pd
 # from front_end import navbar, collapse
 # from analyse_data.regionalizar_distritos import RegionalizarDistritos
-from get_data import obterIdeb, obterDistritos, obterSubprefeituras  # get_data, get_distritos, get_subprefeituras
+from get_data import obterIdeb, obterDistritos, obterSubprefeituras  # , get_data, get_distritos, get_subprefeituras
 import dash_table
 import plotly.io as pio
 
@@ -1229,7 +1229,7 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
 
 
 def toggle_modal(n1, n2, is_open):
-    """(Função obsoleta) Sobe uma tela de info"""
+    """Torna o botão de info funcional"""
 
     if n1 or n2:
         return not is_open

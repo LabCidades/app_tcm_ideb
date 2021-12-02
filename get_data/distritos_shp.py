@@ -14,12 +14,14 @@ class DownloadShapeDists:
     path_dados = 'data/geo_data'
     
     def download(self):
+        """Baixa o arquivo zib com os shapes"""
         
         with requests.get(self.url_distritos) as r:
             shape_zip = r.content
         return shape_zip
     
     def solve_data_dir(self, data_dir=None):
+        """Define o caminho da diretório dos dados"""
         
         if data_dir is None:
             data_dir = self.path_dados
@@ -30,6 +32,7 @@ class DownloadShapeDists:
         return data_dir
     
     def unzip(self, shape_zip, path_dados=None):
+        """Deszipa os arquivo com os shapes"""
                 
         zip_file = ZipFile(BytesIO(shape_zip))
         path_dados = self.solve_data_dir(path_dados)
@@ -37,6 +40,7 @@ class DownloadShapeDists:
         zip_file.extractall(path_dados)
 
     def open_shape(self, path_dados=None):
+        """Abre e lê o arquivo com os shapes e retorna um GeoDataFrame como geodf"""
 
         path_dados = self.solve_data_dir(path_dados)
         path_file = os.path.join(path_dados, 'SIRGAS_SHP_distrito/SIRGAS_SHP_distrito_polygon.shp')
@@ -48,6 +52,7 @@ class DownloadShapeDists:
         return geodf
         
     def __call__(self):
+        """Realiza todas as operações necessárias no arquivo zip com os shapes de uma vez e retorna um geodf"""
         
         shape_zip = self.download()
         

@@ -4,6 +4,7 @@ import geopandas as gpd
 
 
 def subprefeituras(path_salvo, dfIdebIniciais, dfIdebFinais):
+    """Filtra os GeoDados das subprefeituras"""
 
     if os.path.exists(path_salvo):
 

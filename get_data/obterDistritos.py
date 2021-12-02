@@ -6,6 +6,7 @@ import numpy as np
 
 
 def distritos(path_salvo, dfIdebIniciais, dfIdebFinais):
+    """Filtra os GeoDados dos distritos"""
 
     if os.path.exists(path_salvo):
 
@@ -24,8 +25,12 @@ def distritos(path_salvo, dfIdebIniciais, dfIdebFinais):
         dfU = dfIdebIniciais[['coddist', 'universalizacao_2019', 'universalizacao_2020']]
         dfU = dfU.copy()
         dfU['universalizacao_2019'] = pd.to_numeric(dfU['universalizacao_2019'], errors='coerce')
+        dfU['universalizacao_2019'] = dfU['universalizacao_2019'].apply(
+            lambda x: round(x, 2) if not pd.isnull(x) else 0)
         dfU['universalizacao_2020'] = pd.to_numeric(dfU['universalizacao_2020'], errors='coerce')
-        dfU = dfU.replace(np.nan, 0, regex=True)
+        dfU['universalizacao_2020'] = dfU['universalizacao_2020'].apply(
+            lambda x: round(x, 2) if not pd.isnull(x) else 0)
+        # dfU = dfU.replace(np.nan, 0, regex=True)
 
         # dfU = dfIdebIniciais[['A', 'C', 'D']].copy()
         # dfU['universalizacao_2019'] = dfU['universalizacao_2019'].astype(float)
@@ -42,7 +47,9 @@ def distritos(path_salvo, dfIdebIniciais, dfIdebFinais):
         dfGastos = dfIdebIniciais[['coddist', 'gastos_2019']]
         dfGastos = dfGastos.copy()
         dfGastos['gastos_2019'] = pd.to_numeric(dfGastos['gastos_2019'], errors='coerce')
-        dfGastos = dfGastos.replace(np.nan, 0, regex=True)
+        dfGastos['gastos_2019'] = dfGastos['gastos_2019'].apply(
+            lambda x: round(x, 2) if not pd.isnull(x) else 0)
+        # dfGastos = dfGastos.replace(np.nan, 0, regex=True)
         dfGastos = dfGastos.drop_duplicates()
         dfGastos = dfGastos.sort_values('coddist')
 

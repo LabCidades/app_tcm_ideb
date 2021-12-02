@@ -3,6 +3,7 @@ import pandas as pd
 
 
 def dadosIdeb(path_salvo):
+    """Lê os dados do ideb de acordo com o path_salvo"""
 
     if os.path.exists(path_salvo):
         df = pd.read_csv(path_salvo, encoding='latin-1', sep=';')
