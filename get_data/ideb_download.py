@@ -20,7 +20,7 @@ class IdebDownload:
         
         with requests.get(link) as r:
             content = r.content
-        
+
         return content
     
     def check_dir(self):
@@ -28,7 +28,7 @@ class IdebDownload:
         
         if not os.path.exists('raw_data'):
             os.mkdir(self.path_dados)
-    
+
     def unzip(self, content, filename, path_dados):
         """Deszipa o arquivo e retorna o caminho para o arquivo extraido"""
         
@@ -36,9 +36,9 @@ class IdebDownload:
             if filename not in ziped.namelist():
                 raise ValueError(f'{filename} não está no zip. Files:\n {ziped.namelist()}')
             file_path = ziped.extract(filename, path=path_dados)
-        
+
         return file_path
-            
+
     def download_and_unzip_inicias(self):
         """Faz o download e extrai o conteúdo de idebs iniciais"""
         
@@ -61,12 +61,12 @@ class IdebDownload:
         """Chama a si mesmo e faz a download e extração dos idebs inicias e finais"""
 
         if tipo == 'all':
-        
+
             self.download_and_unzip_inicias()
             print('Anos iniciais Ideb baixados com sucesso')
             self.download_and_unzip_finais()
             print('Anos finais Ideb baixados com sucesso')
-        
+
         elif tipo == 'iniciais':
             self.download_and_unzip_inicias()
             print('Anos iniciais Ideb baixados com sucesso')

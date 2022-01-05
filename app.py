@@ -29,14 +29,23 @@ formatted = {'locale': {':,.2f'}, 'nully': '', 'prefix': None, 'specifier': ''}
 # Isso normalmente é aplicado após o app = dash.Dash(__name__)
 # Porém como há cards declarados em variáveis fora dele se fez necessário declarar ele aqui
 colors = {
-    'background': '#000000',
-    'text': '#7FDBFF',
+    # 'background': '#000000',  # Modo escuro
+    # 'text': '#7FDBFF',
+    # 'table_cell': '#111111',
+    # 'table_text': '#bebebe',
+    # 'option_card_bg': '#222222',
+    # 'option_card_txt': '#77BBFF',
+    # 'topic_text': '#FFFFFF',
+    ###############################################
+    'background': '#252525',  # Modo pseudo-escuro
+    'text': '#FFFFFF',
     'table_cell': '#111111',
-    'table_text': '#bebebe',
+    'table_text': '#FFFFFF',
     'option_card_bg': '#222222',
-    'option_card_txt': '#77BBFF',
+    'option_card_txt': '#FFFFFF',
     'topic_text': '#FFFFFF',
-    # 'background': '#FFFFFF',
+    ###############################################
+    # 'background': '#FFFFFF',  # Modo claro
     # 'text': '#101010',
     # 'table_cell': '#EFEFEF',
     # 'table_text': '#111111',
@@ -125,26 +134,26 @@ Para mais informações sobre o Índice de Desenvolvimento da Educação Paulist
 Obs: Os dados com * indicam que a escola não atendeu a um dos critérios necessários para o cálculo do Idep ou das suas metas."'''
 
 info_ideb = html.Div(id="divInfo", children=[
-        dbc.Button(
-            "Info", id="open-body-scroll", color="info", n_clicks=0
-        ),
-        dbc.Modal(
-            [
-                dbc.ModalHeader(id="info_header"),
-                dbc.ModalBody(id="info_body"),
-                dbc.ModalFooter(
-                    dbc.Button(
-                        "Fechar",
-                        id="close-body-scroll",
-                        className="ml-auto",
-                        n_clicks=0,
-                    )
-                ),
-            ],
-            id="modal-body-scroll",
-            scrollable=True,
-            is_open=False,
-        ),
+    dbc.Button(
+        "Info", id="open-body-scroll", color="info", n_clicks=0
+    ),
+    dbc.Modal(
+        [
+            dbc.ModalHeader(id="info_header"),
+            dbc.ModalBody(id="info_body"),
+            dbc.ModalFooter(
+                dbc.Button(
+                    "Fechar",
+                    id="close-body-scroll",
+                    className="ml-auto",
+                    n_clicks=0,
+                )
+            ),
+        ],
+        id="modal-body-scroll",
+        scrollable=True,
+        is_open=False,
+    ),
     ]
 )
 
@@ -158,13 +167,13 @@ divdistritossubpreituras = dbc.Collapse(
                 dbc.Col([
 
                     dcc.RadioItems(id="optdados",
-                        options=[
-                            {'label': 'Distritos', 'value': 'distrito'},
-                            {'label': 'Subprefeituras', 'value': 'subprefeitura'},
-                        ],
-                        value='distrito',
-                        labelStyle={'display': 'inline-block', "margin-right": "20px"}
-                    ),
+                                   options=[
+                                       {'label': 'Distritos', 'value': 'distrito'},
+                                       {'label': 'Subprefeituras', 'value': 'subprefeitura'},
+                                   ],
+                                   value='distrito',
+                                   labelStyle={'display': 'inline-block', "margin-right": "20px"}
+                                   ),
                 ]),
 
                 # info_ideb
@@ -216,9 +225,9 @@ divAnosUnersalizacao = dbc.Collapse(
                                    value=2019,
                                    labelStyle={'display': 'inline-block', "margin-right": "20px"}
                                    ),
-                            ]),
-
                 ]),
+
+            ]),
 
             # dbc.Row([
             #     dbc.Col([
@@ -438,7 +447,7 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
 
 external_stylesheets = [dbc.themes.LUX]
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.CYBORG], suppress_callback_exceptions=True)
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY], suppress_callback_exceptions=True)
 # Para modo claro mude dbc.themes.* para BOOTSTRAP, modo escuro DARKLY ou SLATE e modo extra escuro mude para CYBORG
 
 
@@ -452,7 +461,7 @@ loading_style = {'position': 'absolute', 'align-self': 'center'}
 app.layout = dbc.Container(style={'backgroundColor': colors['background']}, children=[
     dbc.Row([
         dbc.Col([
-            dbc.CardHeader(),
+            dbc.CardHeader(style={'backgroundColor': colors['background']}),
             dbc.Card(style={'backgroundColor': colors['background']}, children=[
                 dbc.CardBody([
                     html.H5(children="Observatório de Políticas Publicas - TCMSP",
@@ -461,79 +470,79 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
 
                     dbc.Row(style={'backgroundColor': colors['background']}, children=[
 
-                            dbc.Col([
-                                dbc.Button("Educação",
-                                           id='btn-educacao',
-                                           color="secondary",
-                                           n_clicks=0),
-                                dbc.Button("Saúde",
-                                           id='btn-saude',
-                                           color="secondary",
-                                           n_clicks=0,
-                                           style={"margin-left": "5px"}),
-                                dbc.Button("Urbanismo",
-                                           id='btn-urbanismo',
-                                           color="secondary",
-                                           n_clicks=0,
-                                           style={"margin-left": "5px"}),
-                                dbc.Button("Orçamento",
-                                           id='btn-orcamento',
-                                           color="secondary",
-                                           n_clicks=0,
-                                           style={"margin-left": "5px"}),
-                            ]),
-                            #
-                            # dbc.Col([
-                            #     dbc.Button("Educação", id='btn-educacao', color="secondary", n_clicks=0, block=True, )
-                            # ], width=3),
-                            # dbc.Col([
-                            #    dbc.Button("Urbanismo", id='btn-urbanismo', color="secondary", n_clicks=0, block=True),
-                            # ], width=3),
-                            # dbc.Col([
-                            #    dbc.Button("Orçamento", id='btn-orcamento', color="secondary", n_clicks=0, block=True),
-                            # ], width=3),
-                            # dbc.Col([
-                            #     dbc.Button("Saúde", id='btn-saude', color="secondary", n_clicks=0, block=True),
-                            # ], width=3),
+                        dbc.Col([
+                            dbc.Button("Educação",
+                                       id='btn-educacao',
+                                       color="secondary",
+                                       n_clicks=0),
+                            dbc.Button("Saúde",
+                                       id='btn-saude',
+                                       color="secondary",
+                                       n_clicks=0,
+                                       style={"margin-left": "5px"}),
+                            dbc.Button("Urbanismo",
+                                       id='btn-urbanismo',
+                                       color="secondary",
+                                       n_clicks=0,
+                                       style={"margin-left": "5px"}),
+                            dbc.Button("Orçamento",
+                                       id='btn-orcamento',
+                                       color="secondary",
+                                       n_clicks=0,
+                                       style={"margin-left": "5px"}),
+                        ]),
+                        #
+                        # dbc.Col([
+                        #     dbc.Button("Educação", id='btn-educacao', color="secondary", n_clicks=0, block=True, )
+                        # ], width=3),
+                        # dbc.Col([
+                        #    dbc.Button("Urbanismo", id='btn-urbanismo', color="secondary", n_clicks=0, block=True),
+                        # ], width=3),
+                        # dbc.Col([
+                        #    dbc.Button("Orçamento", id='btn-orcamento', color="secondary", n_clicks=0, block=True),
+                        # ], width=3),
+                        # dbc.Col([
+                        #     dbc.Button("Saúde", id='btn-saude', color="secondary", n_clicks=0, block=True),
+                        # ], width=3),
 
-                            # html.Div([
-                            #     html.Button('Educação',
-                            #                 id='btn-educacao',
-                            #                 style={'background-color': '#0099cc',
-                            #                        'color': 'white',
-                            #                        'width': '100px',
-                            #                        "margin-left": "0px",
-                            #                        'height': '40px'},
-                            #                n_clicks=0),
-                            #     html.Button('Saúde',
-                            #                  id='btn-saude',
-                            #                  style={'background-color': '#0099cc',
-                            #                         'color': 'white',
-                            #                         'width': '100px',
-                            #                         "margin-left": "10px",
-                            #                         'height': '40px'},
-                            #                  n_clicks=0),
-                            #     html.Button('Urbanismo',
-                            #                 id='btn-urbanismo',
-                            #                style={'background-color':
-                            #                      '#0099cc', 'color':
-                            #                     'white', 'width':
-                            #                      '100px',
-                            #                     "margin-left": "10px",
-                            #                     'height': '40px'},
-                            #               n_clicks=0),
-                            #     html.Button('Orçamento',
-                            #               id='btn-orcamento',
-                            #               style={'background-color': '#0099cc',
-                            #                      'color': 'white',
-                            #                      'width': '100px',
-                            #                       "margin-left": "10px",
-                            #                        'height': '40px'},
-                            #                 n_clicks=0),
-                            #     html.P(""),
-                            #     html.Div(id='drpindicadores')
-                            #         ]),
-                            ]),
+                        # html.Div([
+                        #     html.Button('Educação',
+                        #                 id='btn-educacao',
+                        #                 style={'background-color': '#0099cc',
+                        #                        'color': 'white',
+                        #                        'width': '100px',
+                        #                        "margin-left": "0px",
+                        #                        'height': '40px'},
+                        #                n_clicks=0),
+                        #     html.Button('Saúde',
+                        #                  id='btn-saude',
+                        #                  style={'background-color': '#0099cc',
+                        #                         'color': 'white',
+                        #                         'width': '100px',
+                        #                         "margin-left": "10px",
+                        #                         'height': '40px'},
+                        #                  n_clicks=0),
+                        #     html.Button('Urbanismo',
+                        #                 id='btn-urbanismo',
+                        #                style={'background-color':
+                        #                      '#0099cc', 'color':
+                        #                     'white', 'width':
+                        #                      '100px',
+                        #                     "margin-left": "10px",
+                        #                     'height': '40px'},
+                        #               n_clicks=0),
+                        #     html.Button('Orçamento',
+                        #               id='btn-orcamento',
+                        #               style={'background-color': '#0099cc',
+                        #                      'color': 'white',
+                        #                      'width': '100px',
+                        #                       "margin-left": "10px",
+                        #                        'height': '40px'},
+                        #                 n_clicks=0),
+                        #     html.P(""),
+                        #     html.Div(id='drpindicadores')
+                        #         ]),
+                    ]),
 
                     html.P(""),
                     dbc.Row([
@@ -600,7 +609,7 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                             dcc.Loading(id="Loading-2", type="default",
                                         children=[dcc.Graph(id="GrafEsquerdaSup"),
                                                   ])
-                            ]),
+                        ]),
                         html.Div(id="divGrafEsquerdaInf", children=[
 
                             dcc.Loading(id="Loading-3", type="default",
@@ -624,25 +633,25 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                         html.Div(style={'backgroundColor': colors['background'], 'color': colors['text']},
                                  id="divTabelaDistrito",
                                  children=[
-                                    dash_table.DataTable(id="tabela",
-                                                         data=dfTabelaDistrito.to_dict('records'),
-                                                         sort_action='native',
-                                                         style_table={'height': '350px',
-                                                                      'overflowY': 'auto'},
-                                                         style_header={'fontSize': 13,
-                                                                       'font-family': 'arial',
-                                                                       'fontWeight': 'bold'},
-                                                         style_cell={'backgroundColor': colors['table_cell'],
-                                                                     'color': colors['table_text'],
-                                                                     'textAlign': 'left',
-                                                                     'width': '85px',
-                                                                     'whiteSpace': 'normal',
-                                                                     'fontSize': 13,
-                                                                     'font-family': 'arial'},
-                                                         columns=[
-                                                             {'id': c, 'name': c} for c in dfTabelaDistrito.columns])
+                                     dash_table.DataTable(id="tabela",
+                                                          data=dfTabelaDistrito.to_dict('records'),
+                                                          sort_action='native',
+                                                          style_table={'height': '350px',
+                                                                       'overflowY': 'auto'},
+                                                          style_header={'fontSize': 13,
+                                                                        'font-family': 'arial',
+                                                                        'fontWeight': 'bold'},
+                                                          style_cell={'backgroundColor': colors['table_cell'],
+                                                                      'color': colors['table_text'],
+                                                                      'textAlign': 'left',
+                                                                      'width': '85px',
+                                                                      'whiteSpace': 'normal',
+                                                                      'fontSize': 13,
+                                                                      'font-family': 'arial'},
+                                                          columns=[
+                                                              {'id': c, 'name': c} for c in dfTabelaDistrito.columns])
 
-                        ]),
+                                 ]),
 
                     ])
                 ], color="dark", outline=True),
@@ -668,12 +677,12 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                                                                  'font-family': 'arial'},
                                                      columns=[
                                                          {'id': c, 'name': c, 'type': 'numeric', 'format': Format(
-                                                            scheme=Scheme.fixed,
-                                                            precision=2,
-                                                            group=Group.yes,
-                                                            groups=3,
-                                                            group_delimiter=".",
-                                                            decimal_delimiter=",",
+                                                             scheme=Scheme.fixed,
+                                                             precision=2,
+                                                             group=Group.yes,
+                                                             groups=3,
+                                                             group_delimiter=".",
+                                                             decimal_delimiter=",",
                                                          )}
                                                          for c in dfTabelaGastos_2019.columns])
 
@@ -712,11 +721,11 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                     ])
                 ], color="dark", outline=True),
                 id="collapseTabelaSubprefeitura", is_open=False),
-            dbc.CardHeader()
+            dbc.CardHeader(style={'backgroundColor': colors['background']})
 
         ], width=5),
         dbc.Col(style={'backgroundColor': colors['background'], 'color': colors['text']}, children=[
-            dbc.CardHeader(),
+            dbc.CardHeader(style={'backgroundColor': colors['background']}),
             dbc.Collapse(
 
                 dbc.Card(style={'backgroundColor': colors['background'], 'color': colors['text']}, children=[
@@ -747,10 +756,10 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
 
                         html.Div(id="divGrafDireita",
                                  children=[
-                                    dcc.Loading(id="Loading-1", type="default",
-                                                children=[dcc.Graph(id="choropleth"
-                                                                    # , style={'height': '100%','width': '100%'}
-                                                                    )])
+                                     dcc.Loading(id="Loading-1", type="default",
+                                                 children=[dcc.Graph(id="choropleth"
+                                                                     # , style={'height': '100%','width': '100%'}
+                                                                     )])
                                  ]),
                         html.Div(id="divSlider", style={'margin-bottom': 20}, children=[
                             dcc.RangeSlider(
@@ -773,7 +782,7 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                                             'backgroundColor': colors['background'],
                                             'color': colors['topic_text']},
                                      children=[
-                                     html.H6("Total de Matrículas por Distrito", className="card-title"),
+                                         html.H6("Total de Matrículas por Distrito", className="card-title"),
                                          html.Div(
                                              style={'backgroundColor': colors['background'], 'color': colors['text']},
                                              id="divTabelaEja", children=[
@@ -809,22 +818,22 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
             dbc.Collapse(
 
                 dbc.Card(style={'backgroundColor': colors['background'], 'color': colors['text']}, children=[
-                    dbc.CardImg(src="./assets/mapa_transparente.png", top=True),
+                    dbc.CardImg(src="./assets/logo_observatorio.svg", top=True),
                     dbc.CardBody([
                         html.H3("Observatório de Políticas Públicas", className="card-title"),
                         html.H4("Tribunal de Contas do Município de São Paulo", className="card-title"),
                         html.H5("Escola Superior de Gestão e Contas Públicas", className="card-title"),
-                        dbc.CardLink('Portal TCMSP',
-                                     href="https://portal.tcm.sp.gov.br/", target="_blank"),
+                        dbc.CardLink('IRIS - Informações e Relatórios de Interesse Social',
+                                     href="https://iris.tcm.sp.gov.br/", target="_blank"),
                         html.P(""),
-                        dbc.CardLink('Dados Abertos do Inep.',
-                                     href="https://www.gov.br/inep/pt-br/areas-de-atuacao/pesquisas-estatisticas-e-indicadores/ideb/resultados",
+                        dbc.CardLink('Portal de Dados Abertos da Cidade de São Paulo',
+                                     href="http://dados.prefeitura.sp.gov.br/",
                                      target="_blank"),
 
                     ])
                 ], color="dark", outline=True),
                 id="colApresentacaoDireita", is_open=True),
-            dbc.CardHeader(),
+            dbc.CardHeader(style={'backgroundColor': colors['background']}),
 
         ], width=7)
     ], no_gutters=False)
@@ -835,14 +844,14 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
 # Botões
 #####################################################################
 @app.callback(
-              Output('colEducacao', 'is_open'),
-              Output('colSaude', 'is_open'),
-              Output('colUrbanismo', 'is_open'),
-              Output('colOrcamento', 'is_open'),
-              [Input('btn-educacao', 'n_clicks'),
-               Input('btn-saude', 'n_clicks'),
-               Input('btn-urbanismo', 'n_clicks'),
-               Input('btn-orcamento', 'n_clicks')]
+    Output('colEducacao', 'is_open'),
+    Output('colSaude', 'is_open'),
+    Output('colUrbanismo', 'is_open'),
+    Output('colOrcamento', 'is_open'),
+    [Input('btn-educacao', 'n_clicks'),
+     Input('btn-saude', 'n_clicks'),
+     Input('btn-urbanismo', 'n_clicks'),
+     Input('btn-orcamento', 'n_clicks')]
              )
 def displayClick(btn1, btn2, btn3, btn4):
     """Torna os botões da aplicação interativos retornando os dropdowns
@@ -989,6 +998,8 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                 fig2.update_layout(margin=dict(l=0, r=0, t=50, b=0),
                                    autosize=True,
                                    title="Percentual de escolas por faixa do IDEP <br> Anos Iniciais (2019)")
+                colors_fig2 = ['gold', 'mediumturquoise', 'darkorange', 'lightgreen', 'chartreuse', 'darkmagenta']
+                fig2.update_traces(marker=dict(colors=colors_fig2, line=dict(color='#000000', width=2)))
 
                 dfBarra = pd.read_excel("data/idep_barras_iniciais.xlsx")
                 fig = px.bar(dfBarra, y="Distrito",
@@ -1005,6 +1016,8 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                    autosize=True,
                                    showlegend=True,
                                    title="Escolas que atingiram a meta do IDEP <br> Anos Iniciais (2019)")
+                colors_fig3 = ['salmon', 'springgreen']
+                fig3.update_traces(marker=dict(colors=colors_fig3, line=dict(color='#000000', width=2)))
 
                 labels = ['Não Atingiram', 'Atingiram']
                 values = [65.3, 34.7]
@@ -1014,6 +1027,8 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                    autosize=True,
                                    showlegend=True,
                                    title="Escolas que atingiram a meta do IDEP <br> Anos Finais (2019)")
+                colors_fig4 = ['salmon', 'springgreen']
+                fig4.update_traces(marker=dict(colors=colors_fig4, line=dict(color='#000000', width=2)))
 
                 divEsquerdaSup = {"display": "block"}
                 divEsquerdaInf = {"display": "block"}
@@ -1084,7 +1099,16 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
 
                         ####################
 
-                        fig = gerar_mapa("universalizacao", anos, "dist_universalizacao", anos_universalizacao)
+                        # fig = gerar_mapa("universalizacao", anos, "dist_universalizacao", anos_universalizacao)
+                        dfLineRME = pd.read_excel("data/universalizacao_pre_escola_linha_15-20.xlsx",
+                                                  sheet_name="LINHA evol. matr. RME (15-20)")
+                        fig = px.line(dfLineRME,
+                                      x="Ano",
+                                      y="Matriculas",
+                                      title='Matrículas na Pré-Escola da Rede Municipal de Ensino')
+                        fig.update_layout(xaxis={'title': 'Ano'},
+                                          yaxis={'title': 'Matrículas'})
+                        fig.update_traces(mode="markers+lines")
 
                         ####################
 
@@ -1104,7 +1128,7 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                         fig3 = px.line(dfLine2,
                                        x="Ano",
                                        y=["Matriculas", "Populacao"],
-                                       title='Taxa de Universalização da Educação Infantil <br> (somente pré-escola) (%)')
+                                       title='Taxa de Universalização da Educação Infantil <br> (somente pré-escola)')
                         custom_legend_name(['Matrículas<br>(todas as redes)', 'População<br>(4 e 5 anos)'])
                         fig3.update_layout(yaxis_range=[280000, 350000],
                                            xaxis={'title': 'Ano'},
@@ -1158,10 +1182,12 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                 #               names='Quantidade',
                                 #               title='Population of European continent')
                                 fig2 = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent',
-                                                       insidetextorientation='radial', hole=0.3
+                                                              insidetextorientation='radial', hole=0.3
                                                               )])
                                 fig2.update_layout(margin=dict(l=0, r=0, t=50, b=0), autosize=True,
                                                    title="Percentual por Gênero")
+                                colors_fig2 = ['fuchsia', 'blue']
+                                fig2.update_traces(marker=dict(colors=colors_fig2, line=dict(color='#000000', width=2)))
 
                                 dfEjaMatriculas = pd.read_excel("data/eja.xlsx",
                                                                 sheet_name="Matrículas2")
@@ -1189,6 +1215,9 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                                               insidetextorientation='radial')])
                                 fig3.update_layout(margin=dict(l=0, r=0, t=50, b=0), autosize=True, showlegend=True,
                                                    title="Percentual por Raça")
+                                colors_fig3 = ['#f8f398', 'wheat', 'lightsalmon', 'dimgray', '#6f4e37', '#2c1608',
+                                               'gray']
+                                fig3.update_traces(marker=dict(colors=colors_fig3))
 
                                 labels = ['15-18', '19-25', '26-30', '31-40', '41-50', '51-60', '61-70', '71-94']
                                 values = [6332, 5411, 2679, 6091, 8856, 6994, 3540, 1711]
@@ -1197,6 +1226,9 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                                               insidetextorientation='auto')])
                                 fig4.update_layout(margin=dict(l=0, r=0, t=50, b=0), autosize=True, showlegend=True,
                                                    title="Percentual por Idade")
+                                colors_fig4 = ['gold', 'mediumturquoise', 'darkorange', 'lightgreen', 'chartreuse',
+                                               'darkmagenta']
+                                fig4.update_traces(marker=dict(colors=colors_fig4, line=dict(color='#000000', width=2)))
 
                                 divEsquerdaSup = {"display": "block"}
                                 divEsquerdaInf = {"display": "block"}

@@ -19,13 +19,13 @@ class DadosAbertos:
         self.url_conjunto = url_conjunto
         self.extensoes = extensoes
         self.recursos = self.parse_all_recursos(url_conjunto, extensoes)
-    
+
     def get_page_conjunto(self, url):
         """Atribui uma URL a HTML"""
         
         with requests.get(url) as r:
             html = r.text
-        
+
         return html
     
     def gerar_sopa(self, html):
@@ -64,7 +64,7 @@ class DadosAbertos:
         for extensao in extensoes_solicitadas:
             if extensao not in self.extensoes_suportadas:
                 raise NotImplementedError(f'Extensao {extensao} não suportada')
-    
+
     def parse_all_recursos(self, url_conjunto, extensoes=('csv', )):
         """Parseia todos os recursos e retorna parsed_data"""
         
@@ -81,13 +81,13 @@ class DadosAbertos:
             parsed_resource = self.parsear_recurso(rec)
             
             if parsed_resource['extensao'] in extensoes:
-            
+
                 parsed_data.append(parsed_resource)
-            
+
             else:
                 print('Resource não listado por estar fora da extensão solicitada:')
                 print(f"{parsed_resource['descricao']} : {parsed_resource['extensao']}")
-        
+
         return parsed_data
 
     def check_if_text_download(self, recurso_parsed):
@@ -113,7 +113,7 @@ class DadosAbertos:
         else:
             with requests.get(recurso_parsed['link']) as r:
                 return r.content
-    
+
     def download_all(self, resource_list):
         """Baixa todos os recursos"""
         

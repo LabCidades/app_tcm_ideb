@@ -28,12 +28,12 @@ class DownloadShapeDists:
             
         if not os.path.exists(data_dir):
             os.mkdir(data_dir)
-        
+
         return data_dir
     
     def unzip(self, shape_zip, path_dados=None):
         """Deszipa os arquivo com os shapes"""
-                
+
         zip_file = ZipFile(BytesIO(shape_zip))
         path_dados = self.solve_data_dir(path_dados)
         
@@ -50,7 +50,7 @@ class DownloadShapeDists:
         geodf.set_crs(epsg=31983, inplace=True)
 
         return geodf
-        
+
     def __call__(self):
         """Realiza todas as operações necessárias no arquivo zip com os shapes de uma vez e retorna um geodf"""
         
