@@ -14,7 +14,7 @@ class StaticMapMakerIdeb:
                                  Accepted values are: "finais" or "iniciais"''')
                 regionalizar = RegionalizarDistritos()
             dados_por_distrito = regionalizar(tipo_ideb)
-        
+
         return dados_por_distrito
 
     def get_limites_distritos(self):

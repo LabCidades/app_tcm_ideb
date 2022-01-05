@@ -22,7 +22,7 @@ class ParseIdeb:
 
         if not os.path.exists(filename):
             self.download(tipo=tipo)
-        
+
     def load_wb(self, filename, tipo):
         """Carrega o workbook e retorna ele como wb"""
         
@@ -69,12 +69,12 @@ class DataIdebIniciais:
     sheet = 'IDEB_Escolas (Anos_Iniciais)'
     
     columns = dict(
-            codigo_municipio=2,
-            codigo_escola=4,
-            nome_escola=5,
-            tipo_rede=6,
-            ideb_2019=94
-        )
+        codigo_municipio=2,
+        codigo_escola=4,
+        nome_escola=5,
+        tipo_rede=6,
+        ideb_2019=94
+    )
 
     save_path = 'raw_data/ideb_parsed/'
 
@@ -117,12 +117,12 @@ class DataIdebFinais:
     sheet = 'IDEB_Escolas (Anos_Finais)'
     
     columns = dict(
-            codigo_municipio=2,
-            codigo_escola=4,
-            nome_escola=5,
-            tipo_rede=6,
-            ideb_2019=86
-        )
+        codigo_municipio=2,
+        codigo_escola=4,
+        nome_escola=5,
+        tipo_rede=6,
+        ideb_2019=86
+    )
     
     save_path = 'raw_data/ideb_parsed/'
     
@@ -141,7 +141,7 @@ class DataIdebFinais:
         
         self.__data = self.parser()
         self.__data['tipo_anos'] = 'finais'
-    
+
     @property
     def data(self):
         """Retorna os dados"""

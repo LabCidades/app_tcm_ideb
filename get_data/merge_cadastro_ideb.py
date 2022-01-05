@@ -104,7 +104,7 @@ class JoinData:
         cadastro = self.clean_cadastro(cadastro)
         
         return cadastro, ideb_inicias, ideb_finais
-        
+
     def join_ideb(self, ideb_iniciais, ideb_finais):
         """Faz o join do ideb iniciais com o finais e retorna o joined"""
         
@@ -128,22 +128,22 @@ class JoinData:
 
         if not os.path.exists(path):
             os.mkdir(path)
-        
+
         df.to_csv(os.path.join(path, 'cadastro_ideb_merged.csv'), index=False,
                   sep=';')
         print('Dados merged ideb e cadastrais salvos com sucesso')
-    
+
     def __call__(self, cadastro, ideb_inicias, ideb_finais, path_salvar=None):
         """Chama a si mesmo, relizando a limpeza, join e merge de cadastro, ideb_inicias e ideb_finais"""
         
         cadastro, iniciais, finais = self.clean_data(
-                                                    cadastro, 
-                                                    ideb_inicias, 
-                                                    ideb_finais)
+            cadastro,
+            ideb_inicias,
+            ideb_finais)
         ideb = self.join_ideb(iniciais, finais)
         merged = self.merge_ideb_cadastro(ideb, cadastro)
 
         if path_salvar is not None:
             self.save_joined_df(merged, path_salvar)
-        
+
         return merged

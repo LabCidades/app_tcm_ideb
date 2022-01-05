@@ -15,7 +15,7 @@ class DadosCadastroEscola:
     def __init__(self):
         
         self.dados_abertos_client = DadosAbertos(self.url, self.extensoes)
-    
+
     def parse_ano_rec(self, recurso):
         """Define a variável ano_rec e retorna ela"""
         
@@ -25,7 +25,7 @@ class DadosCadastroEscola:
     
     def baixar_cadastro_ano(self, ano):
         """Analisa os recursos disponíveis e os baixa"""
-    
+
         recursos_disponiveis = self.dados_abertos_client.recursos
         for rec in recursos_disponiveis:
             ano_rec = self.parse_ano_rec(rec)
@@ -49,7 +49,7 @@ class DadosCadastroEscola:
 
         df.to_csv(file_name, sep=sep, index=False)
         print('Dados cadastrais salvos com sucesso')
-            
+
     def dataframe_ano(self, ano, sep=';', save_data=True):
         """Gera um DataFrame com base no ano cadastral e retorna um df"""
         
@@ -59,5 +59,5 @@ class DadosCadastroEscola:
 
         if save_data:
             self.salvar_dados(df, sep)
-        
+
         return df

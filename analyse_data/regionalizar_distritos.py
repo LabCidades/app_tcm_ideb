@@ -79,7 +79,7 @@ class RegionalizarDistritos:
 
         if microdados_ideb is None:
             microdados_ideb = get_data()
-        
+
         if distritos is None:
             distritos = get_distritos()
 
