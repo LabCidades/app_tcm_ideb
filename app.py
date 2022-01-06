@@ -999,7 +999,7 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                    autosize=True,
                                    title="Percentual de escolas por faixa do IDEP <br> Anos Iniciais (2019)")
                 colors_fig2 = ['gold', 'mediumturquoise', 'darkorange', 'lightgreen', 'chartreuse', 'darkmagenta']
-                fig2.update_traces(marker=dict(colors=colors_fig2, line=dict(color='#000000', width=2)))
+                fig2.update_traces(marker=dict(colors=colors_fig2, line=dict(color='#000000', width=1)))
 
                 dfBarra = pd.read_excel("data/idep_barras_iniciais.xlsx")
                 fig = px.bar(dfBarra, y="Distrito",
@@ -1017,7 +1017,7 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                    showlegend=True,
                                    title="Escolas que atingiram a meta do IDEP <br> Anos Iniciais (2019)")
                 colors_fig3 = ['salmon', 'springgreen']
-                fig3.update_traces(marker=dict(colors=colors_fig3, line=dict(color='#000000', width=2)))
+                fig3.update_traces(marker=dict(colors=colors_fig3, line=dict(color='#000000', width=1)))
 
                 labels = ['Não Atingiram', 'Atingiram']
                 values = [65.3, 34.7]
@@ -1028,7 +1028,7 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                    showlegend=True,
                                    title="Escolas que atingiram a meta do IDEP <br> Anos Finais (2019)")
                 colors_fig4 = ['salmon', 'springgreen']
-                fig4.update_traces(marker=dict(colors=colors_fig4, line=dict(color='#000000', width=2)))
+                fig4.update_traces(marker=dict(colors=colors_fig4, line=dict(color='#000000', width=1)))
 
                 divEsquerdaSup = {"display": "block"}
                 divEsquerdaInf = {"display": "block"}
@@ -1228,7 +1228,7 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                                    title="Percentual por Idade")
                                 colors_fig4 = ['gold', 'mediumturquoise', 'darkorange', 'lightgreen', 'chartreuse',
                                                'darkmagenta']
-                                fig4.update_traces(marker=dict(colors=colors_fig4, line=dict(color='#000000', width=2)))
+                                fig4.update_traces(marker=dict(colors=colors_fig4, line=dict(color='#000000', width=1)))
 
                                 divEsquerdaSup = {"display": "block"}
                                 divEsquerdaInf = {"display": "block"}
