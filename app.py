@@ -823,12 +823,12 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                         html.H3("Observatório de Políticas Públicas", className="card-title"),
                         html.H4("Tribunal de Contas do Município de São Paulo", className="card-title"),
                         html.H5("Escola Superior de Gestão e Contas Públicas", className="card-title"),
-                        dbc.CardLink('IRIS - Informações e Relatórios de Interesse Social',
-                                     href="https://iris.tcm.sp.gov.br/", target="_blank"),
-                        html.P(""),
-                        dbc.CardLink('Portal de Dados Abertos da Cidade de São Paulo',
-                                     href="http://dados.prefeitura.sp.gov.br/",
-                                     target="_blank"),
+                        # dbc.CardLink('IRIS - Informações e Relatórios de Interesse Social',
+                        #              href="https://iris.tcm.sp.gov.br/", target="_blank"),
+                        # html.P(""),
+                        # dbc.CardLink('Portal de Dados Abertos da Cidade de São Paulo',
+                        #              href="http://dados.prefeitura.sp.gov.br/",
+                        #              target="_blank"),
 
                     ])
                 ], color="dark", outline=True),
