@@ -30,6 +30,7 @@ formatted = {'locale': {':,.2f'}, 'nully': '', 'prefix': None, 'specifier': ''}
 # Porém como há cards declarados em variáveis fora dele se fez necessário declarar ele aqui
 colors = {
     # 'background': '#000000',  # Modo escuro
+    # 'chart_background': '#000000'
     # 'text': '#7FDBFF',
     # 'table_cell': '#111111',
     # 'table_text': '#bebebe',
@@ -38,14 +39,16 @@ colors = {
     # 'topic_text': '#FFFFFF',
     ###############################################
     'background': '#252525',  # Modo pseudo-escuro
+    'chart_background': '#333333',
     'text': '#FFFFFF',
-    'table_cell': '#111111',
+    'table_cell': '#333333',
     'table_text': '#FFFFFF',
     'option_card_bg': '#222222',
     'option_card_txt': '#FFFFFF',
     'topic_text': '#FFFFFF',
     ###############################################
     # 'background': '#FFFFFF',  # Modo claro
+    # 'chart_background': '#FFFFFF'
     # 'text': '#101010',
     # 'table_cell': '#EFEFEF',
     # 'table_text': '#111111',
@@ -53,9 +56,9 @@ colors = {
     # 'option_card_txt': '#010101',
     # 'topic_text': '#000000'
 }
-# Para alternar entre modo claro e escuro torne a primeira parte comentário e descomente a segunda ou vice-versa
+# Para alternar entre os tipos de modo claro/escuro torne em comentário e descomente as partes relevantes
 # Não se esqueça de também de alterar o template dos gráficos próximo aos imports
-# Você pode opcionalmente alterar o stylesheet perto do app.layout para ficar com modo claro mais completo
+# Você também deve alterar o stylesheet perto do app.layout e a logo
 
 dfDadosIdeb = obterIdeb.dadosIdeb('data/cadastro_ideb_merged.csv')
 dfDadosIdeb['ideb_2019'] = dfDadosIdeb['ideb_2019'].fillna(0)
@@ -135,7 +138,7 @@ Obs: Os dados com * indicam que a escola não atendeu a um dos critérios necess
 
 info_ideb = html.Div(id="divInfo", children=[
     dbc.Button(
-        "Info", id="open-body-scroll", color="info", n_clicks=0
+        "Informações sobre o indicador", id="open-body-scroll", color="info", n_clicks=0
     ),
     dbc.Modal(
         [
@@ -315,13 +318,17 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                 zmin=min_ideb,
                 zmax=geodf[anos_ideb].max(),
             ))
-            fig.update_geos(fitbounds="locations", visible=False, showframe=True, framewidth=0)
+            fig.update_geos(fitbounds="locations", visible=False, showframe=True, framewidth=0,
+                            bgcolor=colors['chart_background'])
             # fig.update_layout(margin=dict(l=0, r=0, t=0, b=0), showlegend=True)
             fig.update_layout(margin={"r": 0, "t": 50, "l": 0, "b": 0},
                               showlegend=False,
                               height=513,
                               title="Distribuição IDEB por Distritos",
-                              mapbox_style="open-street-map")
+                              mapbox_style="open-street-map",
+                              plot_bgcolor=colors['chart_background'],
+                              paper_bgcolor=colors['chart_background']
+                              )
 
         else:
             if tipodados == "subprefeitura":
@@ -343,11 +350,15 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                     zmin=min_ideb,
                     zmax=geodf[anos_ideb].max(),
                 ))
-                fig.update_geos(fitbounds="locations", visible=False)
+                fig.update_geos(fitbounds="locations", visible=False,
+                                bgcolor=colors['chart_background'])
                 fig.update_layout(margin={"r": 0, "t": 50, "l": 0, "b": 0},
                                   showlegend=False,
                                   height=513,
-                                  title="Distribuição IDEB por Subprefeituras")
+                                  title="Distribuição IDEB por Subprefeituras",
+                                  plot_bgcolor=colors['chart_background'],
+                                  paper_bgcolor=colors['chart_background']
+                                  )
 
     else:
         if tipografico == "universalizacao":
@@ -371,11 +382,15 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                     zmin=min_universalizacao_2019,
                     zmax=geodf['universalizacao_2019'].max(),
                 ))
-                fig.update_geos(fitbounds="locations", visible=False)
+                fig.update_geos(fitbounds="locations", visible=False,
+                                bgcolor=colors['chart_background'])
                 fig.update_layout(margin=dict(l=0, r=0, t=50, b=0),
                                   showlegend=False,
                                   height=513,
-                                  title="Universalização da Educação Infantil (2019)")
+                                  title="Universalização da Educação Infantil (2019)",
+                                  plot_bgcolor=colors['chart_background'],
+                                  paper_bgcolor=colors['chart_background']
+                                  )
             else:
 
                 geodf = dfDadosDistritos
@@ -397,11 +412,15 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                     zmin=min_universalizacao_2020,
                     zmax=geodf['universalizacao_2020'].max(),
                 ))
-                fig.update_geos(fitbounds="locations", visible=False)
+                fig.update_geos(fitbounds="locations", visible=False,
+                                bgcolor=colors['chart_background'])
                 fig.update_layout(margin=dict(l=0, r=0, t=50, b=0),
                                   showlegend=False,
                                   height=513,
-                                  title="Universalização da Educação Infantil (2020)")
+                                  title="Universalização da Educação Infantil (2020)",
+                                  plot_bgcolor=colors['chart_background'],
+                                  paper_bgcolor=colors['chart_background']
+                                  )
 
         else:
             if tipografico == "gastos":
@@ -434,11 +453,15 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                     zmin=min_ideb,
                     zmax=geodf['gastos_2019'].max(),
                 ))
-                fig.update_geos(fitbounds="locations", visible=False)
+                fig.update_geos(fitbounds="locations", visible=False,
+                                bgcolor=colors['chart_background'])
                 fig.update_layout(margin=dict(l=0, r=0, t=50, b=0),
                                   showlegend=False,
                                   height=513,
-                                  title="Gastos por Distrito (2019)")
+                                  title="Gastos por Distrito (2019)",
+                                  plot_bgcolor=colors['chart_background'],
+                                  paper_bgcolor=colors['chart_background']
+                                  )
 
         #################################################
 
@@ -485,8 +508,8 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                                        color="secondary",
                                        n_clicks=0,
                                        style={"margin-left": "5px"}),
-                            dbc.Button("Orçamento",
-                                       id='btn-orcamento',
+                            dbc.Button("Regionalização",
+                                       id='btn-regionalizacao',
                                        color="secondary",
                                        n_clicks=0,
                                        style={"margin-left": "5px"}),
@@ -546,6 +569,11 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
 
                     html.P(""),
                     dbc.Row([
+                        dbc.Col(style={'backgroundColor': colors['background']}, children=[
+                            info_ideb
+                        ], md=9)]),
+                    html.P(""),
+                    dbc.Row([
                         dbc.Col([
                             dbc.Collapse(
                                 dcc.Dropdown(
@@ -580,17 +608,14 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
 
                             dbc.Collapse(
                                 dcc.Dropdown(
-                                    id='dpOrcamento',
+                                    id='dpRegionalizacao',
                                     options=[{'label': 'Gastos', 'value': 'gastos'},
                                              ],
                                     placeholder='Escolha um indicador',
                                     style={'backgroundColor': colors['background']}),
-                                id="colOrcamento", is_open=False),
+                                id="colRegionalizacao", is_open=False),
 
                         ], md=9),
-                        dbc.Col(style={'backgroundColor': colors['background']}, children=[
-                            info_ideb
-                        ], md=3),
 
                     ]),
                     # html.Div(id='drpindicadores')
@@ -818,7 +843,7 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
             dbc.Collapse(
 
                 dbc.Card(style={'backgroundColor': colors['background'], 'color': colors['text']}, children=[
-                    dbc.CardImg(src="./assets/logo_observatorio.svg", top=True),
+                    dbc.CardImg(src="./assets/logo_observatorio_dark.svg", top=True),
                     dbc.CardBody([
                         html.H3("Observatório de Políticas Públicas", className="card-title"),
                         html.H4("Tribunal de Contas do Município de São Paulo", className="card-title"),
@@ -847,11 +872,11 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
     Output('colEducacao', 'is_open'),
     Output('colSaude', 'is_open'),
     Output('colUrbanismo', 'is_open'),
-    Output('colOrcamento', 'is_open'),
+    Output('colRegionalizacao', 'is_open'),
     [Input('btn-educacao', 'n_clicks'),
      Input('btn-saude', 'n_clicks'),
      Input('btn-urbanismo', 'n_clicks'),
-     Input('btn-orcamento', 'n_clicks')]
+     Input('btn-regionalizacao', 'n_clicks')]
              )
 def displayClick(btn1, btn2, btn3, btn4):
     """Torna os botões da aplicação interativos retornando os dropdowns
@@ -864,7 +889,7 @@ def displayClick(btn1, btn2, btn3, btn4):
     m_dropdown_educacao = False
     m_dropdown_saude = False
     m_dropdown_urbanismo = False
-    m_dropdown_orcamento = False
+    m_dropdown_regionalizacao = False
 
     if 'btn-educacao' in changed_id:
         m_dropdown_educacao = True
@@ -872,12 +897,12 @@ def displayClick(btn1, btn2, btn3, btn4):
         m_dropdown_saude = True
     elif 'btn-urbanismo' in changed_id:
         m_dropdown_urbanismo = True
-    elif 'btn-orcamento' in changed_id:
-        m_dropdown_orcamento = True
+    elif 'btn-regionalizacao' in changed_id:
+        m_dropdown_regionalizacao = True
     else:
         pass
 
-    return m_dropdown_educacao, m_dropdown_saude, m_dropdown_urbanismo, m_dropdown_orcamento
+    return m_dropdown_educacao, m_dropdown_saude, m_dropdown_urbanismo, m_dropdown_regionalizacao
 
 
 #####################################################################
@@ -906,13 +931,13 @@ def displayClick(btn1, btn2, btn3, btn4):
               Output("collapseTabelaGastos2019", "is_open"),
               Output("collapseTabelaEja", "is_open"),
               Input("dpEducacao", "value"),
-              Input("dpOrcamento", "value"),
+              Input("dpRegionalizacao", "value"),
               Input("optdados", "value"),
               Input("optanos", "value"),
               Input("optuniversalizacao", "value"),
               Input("sliderEja", "value")
               )
-def displayMapa(indicadores_educacao, indicadores_orcamento, dados, anos, anos_universalizacao, sliderEja):
+def displayMapa(indicadores_educacao, indicadores_regionalizacao, dados, anos, anos_universalizacao, sliderEja):
     """Exibe os mapas e/ou gráficos gerados de acordo com os botões clicados, retornando
     as figuras de acordo.
 
@@ -997,16 +1022,23 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                 fig2 = go.Figure(data=[go.Pie(labels=labels, values=values)])
                 fig2.update_layout(margin=dict(l=0, r=0, t=50, b=0),
                                    autosize=True,
-                                   title="Percentual de escolas por faixa do IDEP <br> Anos Iniciais (2019)")
-                colors_fig2 = ['gold', 'mediumturquoise', 'darkorange', 'lightgreen', 'chartreuse', 'darkmagenta']
-                fig2.update_traces(marker=dict(colors=colors_fig2, line=dict(color='#000000', width=2)))
+                                   title="Percentual de escolas por faixa do IDEP <br> Anos Iniciais (2019)",
+                                   plot_bgcolor=colors['chart_background'],
+                                   paper_bgcolor=colors['chart_background']
+                                   )
+                colors_fig2 = ['rgb (230,159,0)', 'rgb (86,180,233)', 'rgb (0,158,115)', 'rgb (240,228,66)',
+                               'rgb (0,114,178)', 'rgb (213,94,0)']
+                fig2.update_traces(marker=dict(colors=colors_fig2, line=dict(color='#000000', width=1)))
 
                 dfBarra = pd.read_excel("data/idep_barras_iniciais.xlsx")
                 fig = px.bar(dfBarra, y="Distrito",
                              x=["Faixa 1", "Faixa 2", "Faixa 3", "Faixa 4", "Faixa 5", "Faixa 6"],
                              orientation='h', title="Distribuição das escolas por faixa do Idep por Distrito (2019)",
                              height=1200)
-                fig.update_layout(font_size=10, yaxis={'categoryorder': 'category descending'})
+                fig.update_layout(font_size=10, yaxis={'categoryorder': 'category descending'},
+                                  plot_bgcolor=colors['chart_background'],
+                                  paper_bgcolor=colors['chart_background']
+                                  )
 
                 labels = ['Não Atingiram', 'Atingiram']
                 values = [15.50, 84.50]
@@ -1015,9 +1047,12 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                 fig3.update_layout(margin=dict(l=0, r=0, t=50, b=0),
                                    autosize=True,
                                    showlegend=True,
-                                   title="Escolas que atingiram a meta do IDEP <br> Anos Iniciais (2019)")
-                colors_fig3 = ['salmon', 'springgreen']
-                fig3.update_traces(marker=dict(colors=colors_fig3, line=dict(color='#000000', width=2)))
+                                   title="Escolas que atingiram a meta do IDEP <br> Anos Iniciais (2019)",
+                                   plot_bgcolor=colors['chart_background'],
+                                   paper_bgcolor=colors['chart_background']
+                                   )
+                colors_fig3 = ['orange', 'skyblue']
+                fig3.update_traces(marker=dict(colors=colors_fig3, line=dict(color='#000000', width=1)))
 
                 labels = ['Não Atingiram', 'Atingiram']
                 values = [65.3, 34.7]
@@ -1026,9 +1061,12 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                 fig4.update_layout(margin=dict(l=0, r=0, t=50, b=0),
                                    autosize=True,
                                    showlegend=True,
-                                   title="Escolas que atingiram a meta do IDEP <br> Anos Finais (2019)")
-                colors_fig4 = ['salmon', 'springgreen']
-                fig4.update_traces(marker=dict(colors=colors_fig4, line=dict(color='#000000', width=2)))
+                                   title="Escolas que atingiram a meta do IDEP <br> Anos Finais (2019)",
+                                   plot_bgcolor=colors['chart_background'],
+                                   paper_bgcolor=colors['chart_background']
+                                   )
+                colors_fig4 = ['orange', 'skyblue']
+                fig4.update_traces(marker=dict(colors=colors_fig4, line=dict(color='#000000', width=1)))
 
                 divEsquerdaSup = {"display": "block"}
                 divEsquerdaInf = {"display": "block"}
@@ -1061,7 +1099,10 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                     fig2.add_trace(go.Scatter(x=df["Ano"], y=df["taxa"]))
                     fig2.update_traces(marker_line_width=2, marker_size=3, mode="markers+lines")
                     fig2.update_layout(margin=dict(l=0, r=0, t=50, b=0), autosize=True,
-                                       title="Taxa de abandono Ensino Fundamental")
+                                       title="Taxa de abandono Ensino Fundamental",
+                                       plot_bgcolor=colors['chart_background'],
+                                       paper_bgcolor=colors['chart_background']
+                                       )
                     fig2.update_xaxes(showline=True, linewidth=2, linecolor='black', gridcolor='black')
                     fig2.update_yaxes(showline=True, linewidth=2, linecolor='black', gridcolor='black')
                     # fig.update_layout(font_size=10, yaxis={'categoryorder': 'category descending'})
@@ -1080,7 +1121,10 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                     fig = px.bar(df, y="Distrito", x="taxa",
                                  orientation='h',
                                  title="Taxa de abandono no Ensino Fundamental(%)")
-                    fig.update_layout(margin=dict(l=0, r=0, t=50, b=0), height=1200, font_size=11)
+                    fig.update_layout(margin=dict(l=0, r=0, t=50, b=0), height=1200, font_size=11,
+                                      plot_bgcolor=colors['chart_background'],
+                                      paper_bgcolor=colors['chart_background']
+                                      )
                     # fig.update_layout(font_size=10, yaxis={'categoryorder': 'category descending'})
                     info = "abandono"
                     info_header = "Indicador - Taxa de Abandono"
@@ -1107,7 +1151,10 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                       y="Matriculas",
                                       title='Matrículas na Pré-Escola da Rede Municipal de Ensino')
                         fig.update_layout(xaxis={'title': 'Ano'},
-                                          yaxis={'title': 'Matrículas'})
+                                          yaxis={'title': 'Matrículas'},
+                                          plot_bgcolor=colors['chart_background'],
+                                          paper_bgcolor=colors['chart_background']
+                                          )
                         fig.update_traces(mode="markers+lines")
 
                         ####################
@@ -1120,7 +1167,10 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                        title='Taxa de Universalização da Educação Infantil <br> (somente pré-escola) (%)')
                         fig2.update_layout(yaxis_range=[88, 100],
                                            xaxis={'title': 'Ano'},
-                                           yaxis={'title': 'Taxa (%)'})
+                                           yaxis={'title': 'Taxa (%)'},
+                                           plot_bgcolor=colors['chart_background'],
+                                           paper_bgcolor=colors['chart_background']
+                                           )
                         fig2.update_traces(mode="markers+lines")
 
                         dfLine2 = pd.read_excel("data/universalizacao_pre_escola_linha_15-20.xlsx",
@@ -1137,7 +1187,10 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                                        yanchor="bottom",
                                                        y=-0.4, xanchor="right",
                                                        x=1),
-                                           legend_title_text='')
+                                           legend_title_text='',
+                                           plot_bgcolor=colors['chart_background'],
+                                           paper_bgcolor=colors['chart_background']
+                                           )
                         fig3.update_traces(mode="markers+lines")
 
                         divEsquerdaSup = {"display": "block"}
@@ -1185,8 +1238,11 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                                               insidetextorientation='radial', hole=0.3
                                                               )])
                                 fig2.update_layout(margin=dict(l=0, r=0, t=50, b=0), autosize=True,
-                                                   title="Percentual por Gênero")
-                                colors_fig2 = ['fuchsia', 'blue']
+                                                   title="Percentual por Gênero",
+                                                   plot_bgcolor=colors['chart_background'],
+                                                   paper_bgcolor=colors['chart_background']
+                                                   )
+                                colors_fig2 = ['skyblue', 'orange']
                                 fig2.update_traces(marker=dict(colors=colors_fig2, line=dict(color='#000000', width=2)))
 
                                 dfEjaMatriculas = pd.read_excel("data/eja.xlsx",
@@ -1199,7 +1255,10 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                               height=600, width=600,
                                               orientation="v",
                                               title="EJA - Matrículas por Distrito")
-                                fig.update_layout(xaxis_tickformat='d')
+                                fig.update_layout(xaxis_tickformat='d',
+                                                  plot_bgcolor=colors['chart_background'],
+                                                  paper_bgcolor=colors['chart_background']
+                                                  )
                                 fig.update_xaxes(
                                     showgrid=True,
                                     ticks="outside",
@@ -1214,7 +1273,10 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                 fig3 = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent',
                                                               insidetextorientation='radial')])
                                 fig3.update_layout(margin=dict(l=0, r=0, t=50, b=0), autosize=True, showlegend=True,
-                                                   title="Percentual por Raça")
+                                                   title="Percentual por Raça",
+                                                   plot_bgcolor=colors['chart_background'],
+                                                   paper_bgcolor=colors['chart_background']
+                                                   )
                                 colors_fig3 = ['#f8f398', 'wheat', 'lightsalmon', 'dimgray', '#6f4e37', '#2c1608',
                                                'gray']
                                 fig3.update_traces(marker=dict(colors=colors_fig3))
@@ -1225,10 +1287,14 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                 fig4 = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent',
                                                               insidetextorientation='auto')])
                                 fig4.update_layout(margin=dict(l=0, r=0, t=50, b=0), autosize=True, showlegend=True,
-                                                   title="Percentual por Idade")
-                                colors_fig4 = ['gold', 'mediumturquoise', 'darkorange', 'lightgreen', 'chartreuse',
-                                               'darkmagenta']
-                                fig4.update_traces(marker=dict(colors=colors_fig4, line=dict(color='#000000', width=2)))
+                                                   title="Percentual por Idade",
+                                                   plot_bgcolor=colors['chart_background'],
+                                                   paper_bgcolor=colors['chart_background']
+                                                   )
+                                colors_fig4 = ['rgb (255,255,255)', 'rgb (230,159,0)', 'rgb (86,180,233)',
+                                               'rgb (0,158,115)', 'rgb (240,228,66)', 'rgb (0,114,178)',
+                                               'rgb (213,94,0)', 'rgb (204,121,167)']
+                                fig4.update_traces(marker=dict(colors=colors_fig4, line=dict(color='#000000', width=1)))
 
                                 divEsquerdaSup = {"display": "block"}
                                 divEsquerdaInf = {"display": "block"}
@@ -1244,7 +1310,7 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                 collapseTabelaEja = True
 
     else:
-        if indicadores_orcamento is not None:
+        if indicadores_regionalizacao is not None:
             pass
 
         else:  # indicadores não escolhidos
