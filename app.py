@@ -319,7 +319,7 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                 zmax=geodf[anos_ideb].max(),
             ))
             fig.update_geos(fitbounds="locations", visible=False, showframe=True, framewidth=0,
-                            bgcolor=colors['chart_background'])
+                            bgcolor=colors['chart_background'], scope="south america")
             # fig.update_layout(margin=dict(l=0, r=0, t=0, b=0), showlegend=True)
             fig.update_layout(margin={"r": 0, "t": 50, "l": 0, "b": 0},
                               showlegend=False,
@@ -351,7 +351,7 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                     zmax=geodf[anos_ideb].max(),
                 ))
                 fig.update_geos(fitbounds="locations", visible=False,
-                                bgcolor=colors['chart_background'])
+                                bgcolor=colors['chart_background'], scope="south america")
                 fig.update_layout(margin={"r": 0, "t": 50, "l": 0, "b": 0},
                                   showlegend=False,
                                   height=513,
@@ -383,7 +383,7 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                     zmax=geodf['universalizacao_2019'].max(),
                 ))
                 fig.update_geos(fitbounds="locations", visible=False,
-                                bgcolor=colors['chart_background'])
+                                bgcolor=colors['chart_background'], scope="south america")
                 fig.update_layout(margin=dict(l=0, r=0, t=50, b=0),
                                   showlegend=False,
                                   height=513,
@@ -413,7 +413,7 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                     zmax=geodf['universalizacao_2020'].max(),
                 ))
                 fig.update_geos(fitbounds="locations", visible=False,
-                                bgcolor=colors['chart_background'])
+                                bgcolor=colors['chart_background'], scope="south america")
                 fig.update_layout(margin=dict(l=0, r=0, t=50, b=0),
                                   showlegend=False,
                                   height=513,
@@ -425,12 +425,12 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
         else:
             if tipografico == "gastos":
                 geodf = dfDadosDistritos
-                geodf['gastos_2019'] = geodf['gastos_2019'].apply(
+                geodf['PER_CAPITA_anual_2020'] = geodf['PER_CAPITA_anual_2020'].apply(
                     lambda x: round(x, 2) if not pd.isnull(x) else 0)
 
                 geodf['geometry'] = geodf['geometry'].to_crs(epsg=4669)
                 geodf['text'] = geodf['ds_nome'] + ':<br>Nota média:' \
-                    + geodf['gastos_2019'].apply(
+                    + geodf['PER_CAPITA_anual_2020'].apply(
                     lambda x: '{:,.2f}'.format(
                         float(str(round(x, 2)))) if not pd.isna(x) or x != 0 else 'Não se aplica')
 
@@ -440,25 +440,25 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
 
                 geodf['text'] = geodf["text"].str.replace('*', ',')
 
-                min_ideb = geodf['gastos_2019'].min()
+                min_ideb = geodf['PER_CAPITA_anual_2020'].min()
                 fig = go.Figure(data=go.Choropleth(
                     geojson=json.loads(geodf.geometry.to_json()),
                     locations=geodf.index,
-                    z=geodf['gastos_2019'],
+                    z=geodf['PER_CAPITA_anual_2020'],
                     colorscale='Reds',
                     autocolorscale=False,
                     text=geodf['text'],  # hover text
                     hoverinfo='text',
-                    colorbar_title="Gastos 2019",
+                    colorbar_title="Gastos Per Capita 2020",
                     zmin=min_ideb,
-                    zmax=geodf['gastos_2019'].max(),
+                    zmax=geodf['PER_CAPITA_anual_2020'].max(),
                 ))
                 fig.update_geos(fitbounds="locations", visible=False,
-                                bgcolor=colors['chart_background'])
+                                bgcolor=colors['chart_background'], scope="south america")
                 fig.update_layout(margin=dict(l=0, r=0, t=50, b=0),
                                   showlegend=False,
                                   height=513,
-                                  title="Gastos por Distrito (2019)",
+                                  title="Gastos por Distrito Per Capita (2020)",
                                   plot_bgcolor=colors['chart_background'],
                                   paper_bgcolor=colors['chart_background']
                                   )
@@ -848,12 +848,12 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                         html.H3("Observatório de Políticas Públicas", className="card-title"),
                         html.H4("Tribunal de Contas do Município de São Paulo", className="card-title"),
                         html.H5("Escola Superior de Gestão e Contas Públicas", className="card-title"),
-                        dbc.CardLink('IRIS - Informações e Relatórios de Interesse Social',
-                                     href="https://iris.tcm.sp.gov.br/", target="_blank"),
-                        html.P(""),
-                        dbc.CardLink('Portal de Dados Abertos da Cidade de São Paulo',
-                                     href="http://dados.prefeitura.sp.gov.br/",
-                                     target="_blank"),
+                        # dbc.CardLink('IRIS - Informações e Relatórios de Interesse Social',
+                        #              href="https://iris.tcm.sp.gov.br/", target="_blank"),
+                        # html.P(""),
+                        # dbc.CardLink('Portal de Dados Abertos da Cidade de São Paulo',
+                        #              href="http://dados.prefeitura.sp.gov.br/",
+                        #              target="_blank"),
 
                     ])
                 ], color="dark", outline=True),
