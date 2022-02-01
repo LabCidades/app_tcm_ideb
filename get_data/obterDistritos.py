@@ -44,10 +44,13 @@ def distritos(path_salvo, dfIdebIniciais, dfIdebFinais):
         dfU = dfU.drop_duplicates()
         dfU = dfU.sort_values('coddist')
 
-        dfGastos = dfIdebIniciais[['coddist', 'gastos_2019']]
+        dfGastos = dfIdebIniciais[['coddist', 'gastos_2019', 'PER_CAPITA_anual_2020']]
         dfGastos = dfGastos.copy()
         dfGastos['gastos_2019'] = pd.to_numeric(dfGastos['gastos_2019'], errors='coerce')
         dfGastos['gastos_2019'] = dfGastos['gastos_2019'].apply(
+            lambda x: round(x, 2) if not pd.isnull(x) else 0)
+        dfGastos['PER_CAPITA_anual_2020'] = pd.to_numeric(dfGastos['PER_CAPITA_anual_2020'], errors='coerce')
+        dfGastos['PER_CAPITA_anual_2020'] = dfGastos['PER_CAPITA_anual_2020'].apply(
             lambda x: round(x, 2) if not pd.isnull(x) else 0)
         # dfGastos = dfGastos.replace(np.nan, 0, regex=True)
         dfGastos = dfGastos.drop_duplicates()

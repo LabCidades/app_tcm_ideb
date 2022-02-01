@@ -111,8 +111,9 @@ dfTabelaGastos_2019['gastos_2019'] = dfTabelaGastos_2019['gastos_2019'].apply(
 dfTabelaGastos_2019 = dfTabelaGastos_2019.rename(columns={'ds_nome': 'Nome', 'gastos_2019': 'Gastos'}, inplace=False)
 # dfTabelaGastos_2019['Gastos']=dfTabelaGastos_2019['Gastos'].map('{:,.2f}'.format)
 
-dfEjaConsolidado = pd.read_excel("data/eja.xlsx",
-                                 sheet_name="Consolidados")
+dfEjaConsolidado = pd.read_csv("data/eja_consolidados.csv",
+                               sep=";",
+                               decimal=",")
 
 
 info_ideb = '''Os dados acima refletem o ano de 2019 e
@@ -319,7 +320,7 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                 zmax=geodf[anos_ideb].max(),
             ))
             fig.update_geos(fitbounds="locations", visible=False, showframe=True, framewidth=0,
-                            bgcolor=colors['chart_background'])
+                            bgcolor=colors['chart_background'], scope="south america")
             # fig.update_layout(margin=dict(l=0, r=0, t=0, b=0), showlegend=True)
             fig.update_layout(margin={"r": 0, "t": 50, "l": 0, "b": 0},
                               showlegend=False,
@@ -351,7 +352,7 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                     zmax=geodf[anos_ideb].max(),
                 ))
                 fig.update_geos(fitbounds="locations", visible=False,
-                                bgcolor=colors['chart_background'])
+                                bgcolor=colors['chart_background'], scope="south america")
                 fig.update_layout(margin={"r": 0, "t": 50, "l": 0, "b": 0},
                                   showlegend=False,
                                   height=513,
@@ -383,7 +384,7 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                     zmax=geodf['universalizacao_2019'].max(),
                 ))
                 fig.update_geos(fitbounds="locations", visible=False,
-                                bgcolor=colors['chart_background'])
+                                bgcolor=colors['chart_background'], scope="south america")
                 fig.update_layout(margin=dict(l=0, r=0, t=50, b=0),
                                   showlegend=False,
                                   height=513,
@@ -413,7 +414,7 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                     zmax=geodf['universalizacao_2020'].max(),
                 ))
                 fig.update_geos(fitbounds="locations", visible=False,
-                                bgcolor=colors['chart_background'])
+                                bgcolor=colors['chart_background'], scope="south america")
                 fig.update_layout(margin=dict(l=0, r=0, t=50, b=0),
                                   showlegend=False,
                                   height=513,
@@ -425,12 +426,12 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
         else:
             if tipografico == "gastos":
                 geodf = dfDadosDistritos
-                geodf['gastos_2019'] = geodf['gastos_2019'].apply(
+                geodf['PER_CAPITA_anual_2020'] = geodf['PER_CAPITA_anual_2020'].apply(
                     lambda x: round(x, 2) if not pd.isnull(x) else 0)
 
                 geodf['geometry'] = geodf['geometry'].to_crs(epsg=4669)
                 geodf['text'] = geodf['ds_nome'] + ':<br>Nota média:' \
-                    + geodf['gastos_2019'].apply(
+                    + geodf['PER_CAPITA_anual_2020'].apply(
                     lambda x: '{:,.2f}'.format(
                         float(str(round(x, 2)))) if not pd.isna(x) or x != 0 else 'Não se aplica')
 
@@ -440,25 +441,25 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
 
                 geodf['text'] = geodf["text"].str.replace('*', ',')
 
-                min_ideb = geodf['gastos_2019'].min()
+                min_ideb = geodf['PER_CAPITA_anual_2020'].min()
                 fig = go.Figure(data=go.Choropleth(
                     geojson=json.loads(geodf.geometry.to_json()),
                     locations=geodf.index,
-                    z=geodf['gastos_2019'],
+                    z=geodf['PER_CAPITA_anual_2020'],
                     colorscale='Reds',
                     autocolorscale=False,
                     text=geodf['text'],  # hover text
                     hoverinfo='text',
-                    colorbar_title="Gastos 2019",
+                    colorbar_title="Gastos Per Capita 2020",
                     zmin=min_ideb,
-                    zmax=geodf['gastos_2019'].max(),
+                    zmax=geodf['PER_CAPITA_anual_2020'].max(),
                 ))
                 fig.update_geos(fitbounds="locations", visible=False,
-                                bgcolor=colors['chart_background'])
+                                bgcolor=colors['chart_background'], scope="south america")
                 fig.update_layout(margin=dict(l=0, r=0, t=50, b=0),
                                   showlegend=False,
                                   height=513,
-                                  title="Gastos por Distrito (2019)",
+                                  title="Gastos por Distrito Per Capita (2020)",
                                   plot_bgcolor=colors['chart_background'],
                                   paper_bgcolor=colors['chart_background']
                                   )
@@ -1030,7 +1031,9 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                'rgb (0,114,178)', 'rgb (213,94,0)']
                 fig2.update_traces(marker=dict(colors=colors_fig2, line=dict(color='#000000', width=1)))
 
-                dfBarra = pd.read_excel("data/idep_barras_iniciais.xlsx")
+                dfBarra = pd.read_csv("data/idep_barras_iniciais.csv",
+                                      sep=";",
+                                      decimal=",")
                 fig = px.bar(dfBarra, y="Distrito",
                              x=["Faixa 1", "Faixa 2", "Faixa 3", "Faixa 4", "Faixa 5", "Faixa 6"],
                              orientation='h', title="Distribuição das escolas por faixa do Idep por Distrito (2019)",
@@ -1082,7 +1085,9 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
             else:
 
                 if indicadores_educacao == "abandono":
-                    df = pd.read_excel("data/evasao_linha.xlsx")
+                    df = pd.read_csv("data/evasao_linha.csv",
+                                     sep=";",
+                                     decimal=",")
 
                     fig2.add_trace(go.Scatter(
                         x=df.Ano, y=df.taxa, mode="markers", line_shape='linear',
@@ -1115,7 +1120,9 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                     collapseGraficosDireita = True
                     card_Apresentacao_Direita = False
 
-                    df = pd.read_excel("data/evasao_barra.xlsx")
+                    df = pd.read_csv("data/evasao_barra.csv",
+                                     sep=";",
+                                     decimal=",")
                     df['taxa'] = pd.to_numeric(df['taxa'], errors='coerce')
                     df = df.sort_values("taxa")
                     fig = px.bar(df, y="Distrito", x="taxa",
@@ -1144,8 +1151,9 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                         ####################
 
                         # fig = gerar_mapa("universalizacao", anos, "dist_universalizacao", anos_universalizacao)
-                        dfLineRME = pd.read_excel("data/universalizacao_pre_escola_linha_15-20.xlsx",
-                                                  sheet_name="LINHA evol. matr. RME (15-20)")
+                        dfLineRME = pd.read_csv("data/universalizacao_evol_matr_rme_15-20.csv",
+                                                sep=";",
+                                                decimal=",")
                         fig = px.line(dfLineRME,
                                       x="Ano",
                                       y="Matriculas",
@@ -1159,8 +1167,9 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
 
                         ####################
 
-                        dfLine = pd.read_excel("data/universalizacao_pre_escola_linha_15-20.xlsx",
-                                               sheet_name="LINHA evol indic mun (15-20)")
+                        dfLine = pd.read_csv("data/universalizacao_evol_indic_mun_15-20.csv",
+                                             sep=";",
+                                             decimal=",")
                         fig2 = px.line(dfLine,
                                        x="Ano",
                                        y="Taxa",
@@ -1173,8 +1182,9 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                            )
                         fig2.update_traces(mode="markers+lines")
 
-                        dfLine2 = pd.read_excel("data/universalizacao_pre_escola_linha_15-20.xlsx",
-                                                sheet_name="LINHA evol. var mun (15-20)")
+                        dfLine2 = pd.read_csv("data/universalizacao_evol_var_mun_15-20.csv",
+                                              sep=";",
+                                              decimal=",")
                         fig3 = px.line(dfLine2,
                                        x="Ano",
                                        y=["Matriculas", "Populacao"],
@@ -1223,8 +1233,8 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
 
                             if indicadores_educacao == "eja":
 
-                                dfEjaGenero = pd.read_excel("data/eja.xlsx",
-                                                            sheet_name="gênero")
+                                # dfEjaGenero = pd.read_excel("data/eja.xlsx",
+                                #                             sheet_name="gênero")
 
                                 labels = ['Feminino', 'Masculino']
                                 values = [16515, 25103]
@@ -1245,8 +1255,9 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                 colors_fig2 = ['skyblue', 'orange']
                                 fig2.update_traces(marker=dict(colors=colors_fig2, line=dict(color='#000000', width=2)))
 
-                                dfEjaMatriculas = pd.read_excel("data/eja.xlsx",
-                                                                sheet_name="Matrículas2")
+                                dfEjaMatriculas = pd.read_csv("data/eja_matriculas2.csv",
+                                                                sep=";",
+                                                                decimal=",")
 
                                 dfSlider = dfEjaMatriculas.loc[(dfEjaMatriculas['Ano'] >= sliderEja[0]) &
                                                                (dfEjaMatriculas['Ano'] <= sliderEja[1])]
