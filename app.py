@@ -430,7 +430,7 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                     lambda x: round(x, 2) if not pd.isnull(x) else 0)
 
                 geodf['geometry'] = geodf['geometry'].to_crs(epsg=4669)
-                geodf['text'] = geodf['ds_nome'] + ':<br>Nota média:' \
+                geodf['text'] = geodf['ds_nome'] + ':<br>Gasto: ' \
                     + geodf['PER_CAPITA_anual_2020'].apply(
                     lambda x: '{:,.2f}'.format(
                         float(str(round(x, 2)))) if not pd.isna(x) or x != 0 else 'Não se aplica')
@@ -509,11 +509,11 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                                        color="secondary",
                                        n_clicks=0,
                                        style={"margin-left": "5px"}),
-                            dbc.Button("Regionalização",
-                                       id='btn-regionalizacao',
-                                       color="secondary",
-                                       n_clicks=0,
-                                       style={"margin-left": "5px"}),
+                            # dbc.Button("Regionalização",
+                            #            id='btn-regionalizacao',
+                            #            color="secondary",
+                            #            n_clicks=0,
+                            #            style={"margin-left": "5px"}),
                         ]),
                         #
                         # dbc.Col([
@@ -607,14 +607,14 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                                     style={'backgroundColor': colors['background']}),
                                 id="colUrbanismo", is_open=False),
 
-                            dbc.Collapse(
-                                dcc.Dropdown(
-                                    id='dpRegionalizacao',
-                                    options=[{'label': 'Gastos', 'value': 'gastos'},
-                                             ],
-                                    placeholder='Escolha um indicador',
-                                    style={'backgroundColor': colors['background']}),
-                                id="colRegionalizacao", is_open=False),
+                            # dbc.Collapse(
+                            #     dcc.Dropdown(
+                            #         id='dpRegionalizacao',
+                            #         options=[{'label': 'Gastos', 'value': 'gastos'},
+                            #                  ],
+                            #         placeholder='Escolha um indicador',
+                            #         style={'backgroundColor': colors['background']}),
+                            #     id="colRegionalizacao", is_open=False),
 
                         ], md=9),
 
@@ -873,13 +873,14 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
     Output('colEducacao', 'is_open'),
     Output('colSaude', 'is_open'),
     Output('colUrbanismo', 'is_open'),
-    Output('colRegionalizacao', 'is_open'),
+    # Output('colRegionalizacao', 'is_open'),
     [Input('btn-educacao', 'n_clicks'),
      Input('btn-saude', 'n_clicks'),
      Input('btn-urbanismo', 'n_clicks'),
-     Input('btn-regionalizacao', 'n_clicks')]
+     # Input('btn-regionalizacao', 'n_clicks')
+     ]
              )
-def displayClick(btn1, btn2, btn3, btn4):
+def displayClick(btn1, btn2, btn3): # btn4
     """Torna os botões da aplicação interativos retornando os dropdowns
     que aparecem ao clicar neles.
 
@@ -890,7 +891,7 @@ def displayClick(btn1, btn2, btn3, btn4):
     m_dropdown_educacao = False
     m_dropdown_saude = False
     m_dropdown_urbanismo = False
-    m_dropdown_regionalizacao = False
+    # m_dropdown_regionalizacao = False
 
     if 'btn-educacao' in changed_id:
         m_dropdown_educacao = True
@@ -898,12 +899,12 @@ def displayClick(btn1, btn2, btn3, btn4):
         m_dropdown_saude = True
     elif 'btn-urbanismo' in changed_id:
         m_dropdown_urbanismo = True
-    elif 'btn-regionalizacao' in changed_id:
-        m_dropdown_regionalizacao = True
+    # elif 'btn-regionalizacao' in changed_id:
+    #     m_dropdown_regionalizacao = True
     else:
         pass
 
-    return m_dropdown_educacao, m_dropdown_saude, m_dropdown_urbanismo, m_dropdown_regionalizacao
+    return m_dropdown_educacao, m_dropdown_saude, m_dropdown_urbanismo # , m_dropdown_regionalizacao
 
 
 #####################################################################
@@ -932,13 +933,13 @@ def displayClick(btn1, btn2, btn3, btn4):
               Output("collapseTabelaGastos2019", "is_open"),
               Output("collapseTabelaEja", "is_open"),
               Input("dpEducacao", "value"),
-              Input("dpRegionalizacao", "value"),
+              # Input("dpRegionalizacao", "value"),
               Input("optdados", "value"),
               Input("optanos", "value"),
               Input("optuniversalizacao", "value"),
               Input("sliderEja", "value")
               )
-def displayMapa(indicadores_educacao, indicadores_regionalizacao, dados, anos, anos_universalizacao, sliderEja):
+def displayMapa(indicadores_educacao, dados, anos, anos_universalizacao, sliderEja): # indicadores_regionalizacao
     """Exibe os mapas e/ou gráficos gerados de acordo com os botões clicados, retornando
     as figuras de acordo.
 
@@ -1320,16 +1321,16 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                 card_Apresentacao_Direita = False
                                 collapseTabelaEja = True
 
-    else:
-        if indicadores_regionalizacao is not None:
-            pass
+    # else:
+    #     if indicadores_regionalizacao is not None:
+    #         pass
 
-        else:  # indicadores não escolhidos
-            return (go.Figure(), go.Figure(), go.Figure(), go.Figure(), collapsedivdanos,
-                    colapseddivistritossubpreituras, card_universalizacao, divEsquerdaSup, divEsquerdaInf,
-                    divEsquerdaInf2, divGrafDireita, info, divInfo, divSlider, info_header, collapseGraficosEsquerda,
-                    collapseGraficosDireita, card_Apresentacao_Direita, collapseTabelaDistrito,
-                    collapseTabelaSubprefeitura, collapseTabelaGastos2019, collapseTabelaEja)
+    else:  # indicadores não escolhidos
+        return (go.Figure(), go.Figure(), go.Figure(), go.Figure(), collapsedivdanos,
+                colapseddivistritossubpreituras, card_universalizacao, divEsquerdaSup, divEsquerdaInf,
+                divEsquerdaInf2, divGrafDireita, info, divInfo, divSlider, info_header, collapseGraficosEsquerda,
+                collapseGraficosDireita, card_Apresentacao_Direita, collapseTabelaDistrito,
+                collapseTabelaSubprefeitura, collapseTabelaGastos2019, collapseTabelaEja)
 
     return (fig, fig2, fig3, fig4, collapsedivdanos, colapseddivistritossubpreituras, card_universalizacao,
             divEsquerdaSup, divEsquerdaInf, divEsquerdaInf2, divGrafDireita, info, divInfo, divSlider, info_header,
