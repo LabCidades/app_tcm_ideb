@@ -441,7 +441,7 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
 
                 geodf['text'] = geodf["text"].str.replace('*', ',')
 
-                min_ideb = geodf['PER_CAPITA_anual_2020'].min()
+                min_percapita = geodf['PER_CAPITA_anual_2020'].min()
                 fig = go.Figure(data=go.Choropleth(
                     geojson=json.loads(geodf.geometry.to_json()),
                     locations=geodf.index,
@@ -451,7 +451,7 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                     text=geodf['text'],  # hover text
                     hoverinfo='text',
                     colorbar_title="Gastos Per Capita 2020",
-                    zmin=min_ideb,
+                    zmin=min_percapita,
                     zmax=geodf['PER_CAPITA_anual_2020'].max(),
                 ))
                 fig.update_geos(fitbounds="locations", visible=False,
