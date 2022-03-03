@@ -109,6 +109,13 @@ dfTabelaGastos_2019 = dfTabelaGastos_2019.copy()
 dfTabelaGastos_2019['gastos_2019'] = dfTabelaGastos_2019['gastos_2019'].apply(
     lambda x: round(x, 2) if not pd.isnull(x) else 0)
 dfTabelaGastos_2019 = dfTabelaGastos_2019.rename(columns={'ds_nome': 'Nome', 'gastos_2019': 'Gastos'}, inplace=False)
+
+# dfTabelaGastos_2019 = dfDadosDistritos[['ds_nome', 'gastos_2019']]
+# dfTabelaGastos_2019 = dfTabelaGastos_2019.copy()
+# dfTabelaGastos_2019['gastos_2019'] = dfTabelaGastos_2019['gastos_2019'].apply(
+#     lambda x: round(x, 2) if not pd.isnull(x) else 0)
+# dfTabelaGastos_2019 = dfTabelaGastos_2019.rename(columns={'ds_nome': 'Nome', 'gastos_2019': 'Gastos'}, inplace=False)
+
 # dfTabelaGastos_2019['Gastos']=dfTabelaGastos_2019['Gastos'].map('{:,.2f}'.format)
 
 dfEjaConsolidado = pd.read_csv("data/eja_consolidados.csv",
@@ -292,7 +299,7 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                         tipodados: String;
                         anos_universalizacao: int}
 
-    Options:{tipografico: 'ideb', 'univerzalizacao' ou 'gastos'
+    Options:{tipografico: 'ideb', 'univerzalizacao', 'gastos1' ou 'gastos2'
                 tipodados: 'distritos' ou 'subprefeituras'
                 anos_universalizacao: 2019}"""
 
@@ -424,7 +431,7 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                                   )
 
         else:
-            if tipografico == "gastos":
+            if tipografico == "gastos1":
                 geodf = dfDadosDistritos
                 geodf['PER_CAPITA_anual_2020'] = geodf['PER_CAPITA_anual_2020'].apply(
                     lambda x: round(x, 2) if not pd.isnull(x) else 0)
@@ -582,7 +589,8 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                                     options=[{'label': 'Ideb', 'value': 'ideb'},
                                              {'label': 'Idep', 'value': 'idep'},
                                              {'label': 'EJA', 'value': 'eja'},
-                                             {'label': 'Gastos', 'value': 'gastos'},
+                                             {'label': 'Gastos Per Capita', 'value': 'gastos1'},
+                                             {'label': 'Gasto Absoluto', 'value': 'gastos2'},
                                              {'label': 'Taxa de Abandono', 'value': 'abandono'},
                                              {'label': 'Universalização', 'value': 'universalizacao'}],
                                     placeholder='Escolha um indicador',
@@ -593,6 +601,7 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                                 dcc.Dropdown(
                                     id='dpSaude',
                                     options=[{'label': 'Em desenvolvimento', 'value': 'saude1'},
+                                             {'label': 'Gasto com UBS', 'value': 'ubs'},
                                              ],
                                     placeholder='Escolha um indicador',
                                     style={'backgroundColor': colors['background']}),
@@ -945,7 +954,7 @@ def displayMapa(indicadores_educacao, dados, anos, anos_universalizacao, sliderE
 
     Variable type: String
 
-    Options: 'ideb', 'idep', 'abandono', 'universalizacao', 'gastos' ou 'eja'"""
+    Options: 'ideb', 'idep', 'abandono', 'universalizacao', 'gastos1', 'gastos2' ou 'eja'"""
 
     user_click = dash.callback_context.triggered[0]['prop_id'].split('.')[0]
     colapseddivistritossubpreituras = False
@@ -1217,8 +1226,8 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
 
                     else:
 
-                        if indicadores_educacao == "gastos":
-                            fig = gerar_mapa("gastos", anos, "", 0)
+                        if indicadores_educacao == "gastos1":
+                            fig = gerar_mapa("gastos1", anos, "", 0)
 
                             divEsquerdaSup = {"display": "block"}
                             divEsquerdaInf = {"display": "block"}
@@ -1257,8 +1266,8 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                 fig2.update_traces(marker=dict(colors=colors_fig2, line=dict(color='#000000', width=2)))
 
                                 dfEjaMatriculas = pd.read_csv("data/eja_matriculas2.csv",
-                                                                sep=";",
-                                                                decimal=",")
+                                                              sep=";",
+                                                              decimal=",")
 
                                 dfSlider = dfEjaMatriculas.loc[(dfEjaMatriculas['Ano'] >= sliderEja[0]) &
                                                                (dfEjaMatriculas['Ano'] <= sliderEja[1])]
@@ -1320,6 +1329,22 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                 collapseGraficosDireita = True
                                 card_Apresentacao_Direita = False
                                 collapseTabelaEja = True
+
+                            else:
+
+                                if indicadores_educacao == 'gastos2':
+
+                                    fig = gerar_mapa("gastos1", anos, "", 0)
+
+                                    divEsquerdaSup = {"display": "block"}
+                                    divEsquerdaInf = {"display": "block"}
+                                    divGrafDireita = {"display": "block"}
+                                    divInfo = {"display": "block"}
+                                    info = info_idep
+                                    info_header = "Indicador - IDEP"
+                                    collapseGraficosDireita = True
+                                    card_Apresentacao_Direita = False
+                                    collapseTabelaGastos2019 = True
 
     # else:
     #     if indicadores_regionalizacao is not None:
