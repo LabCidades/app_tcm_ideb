@@ -104,11 +104,35 @@ dfTabelaSubprefeitura['Finais'] = dfTabelaSubprefeitura['Finais'].apply(
 dfTabelaSubprefeitura['Média'] = dfTabelaSubprefeitura['Média'].apply(
     lambda x: round(x, 2) if not pd.isnull(x) else 0)
 
-dfTabelaGastos_2019 = dfDadosDistritos[['ds_nome', 'gastos_2019']]
-dfTabelaGastos_2019 = dfTabelaGastos_2019.copy()
-dfTabelaGastos_2019['gastos_2019'] = dfTabelaGastos_2019['gastos_2019'].apply(
+dfTabelaGastos_PerCapita = dfDadosDistritos[['ds_nome', 'PER_CAPITA_anual_2020']]
+dfTabelaGastos_PerCapita = dfTabelaGastos_PerCapita.copy()
+dfTabelaGastos_PerCapita['PER_CAPITA_anual_2020'] = dfTabelaGastos_PerCapita['PER_CAPITA_anual_2020'].apply(
     lambda x: round(x, 2) if not pd.isnull(x) else 0)
-dfTabelaGastos_2019 = dfTabelaGastos_2019.rename(columns={'ds_nome': 'Nome', 'gastos_2019': 'Gastos'}, inplace=False)
+dfTabelaGastos_PerCapita = dfTabelaGastos_PerCapita.rename(columns=
+                                                           {'ds_nome': 'Nome', 'PER_CAPITA_anual_2020': 'Gastos'},
+                                                           inplace=False)
+
+dfTabelaGastos_Absoluto = dfDadosDistritos[['ds_nome', 'VALOR_TOTAL_ANUAL']]
+dfTabelaGastos_Absoluto = dfTabelaGastos_Absoluto.copy()
+dfTabelaGastos_Absoluto['VALOR_TOTAL_ANUAL'] = dfTabelaGastos_Absoluto['VALOR_TOTAL_ANUAL'].apply(
+    lambda x: round(x, 2) if not pd.isnull(x) else 0)
+dfTabelaGastos_Absoluto = dfTabelaGastos_Absoluto.rename(columns=
+                                                         {'ds_nome': 'Nome', 'VALOR_TOTAL_ANUAL': 'Gastos'},
+                                                         inplace=False)
+
+dfTabelaGastos_UBS = dfDadosDistritos[['ds_nome', 'REMUNERACAO_BRUTA_UBS']]
+dfTabelaGastos_UBS = dfTabelaGastos_UBS.copy()
+dfTabelaGastos_UBS['REMUNERACAO_BRUTA_UBS'] = dfTabelaGastos_UBS['REMUNERACAO_BRUTA_UBS'].apply(
+    lambda x: round(x, 2) if not pd.isnull(x) else 0)
+dfTabelaGastos_UBS = dfTabelaGastos_UBS.rename(columns={'ds_nome': 'Nome', 'REMUNERACAO_BRUTA_UBS': 'Gastos'},
+                                               inplace=False)
+
+# dfTabelaGastos_2019 = dfDadosDistritos[['ds_nome', 'gastos_2019']]
+# dfTabelaGastos_2019 = dfTabelaGastos_2019.copy()
+# dfTabelaGastos_2019['gastos_2019'] = dfTabelaGastos_2019['gastos_2019'].apply(
+#     lambda x: round(x, 2) if not pd.isnull(x) else 0)
+# dfTabelaGastos_2019 = dfTabelaGastos_2019.rename(columns={'ds_nome': 'Nome', 'gastos_2019': 'Gastos'}, inplace=False)
+
 # dfTabelaGastos_2019['Gastos']=dfTabelaGastos_2019['Gastos'].map('{:,.2f}'.format)
 
 dfEjaConsolidado = pd.read_csv("data/eja_consolidados.csv",
@@ -292,7 +316,7 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                         tipodados: String;
                         anos_universalizacao: int}
 
-    Options:{tipografico: 'ideb', 'univerzalizacao' ou 'gastos'
+    Options:{tipografico: 'ideb', 'univerzalizacao', 'gastos1' ou 'gastos2'
                 tipodados: 'distritos' ou 'subprefeituras'
                 anos_universalizacao: 2019}"""
 
@@ -424,13 +448,13 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                                   )
 
         else:
-            if tipografico == "gastos":
+            if tipografico == "gastos1":
                 geodf = dfDadosDistritos
                 geodf['PER_CAPITA_anual_2020'] = geodf['PER_CAPITA_anual_2020'].apply(
                     lambda x: round(x, 2) if not pd.isnull(x) else 0)
 
                 geodf['geometry'] = geodf['geometry'].to_crs(epsg=4669)
-                geodf['text'] = geodf['ds_nome'] + ':<br>Nota média:' \
+                geodf['text'] = geodf['ds_nome'] + ':<br>Gasto: ' \
                     + geodf['PER_CAPITA_anual_2020'].apply(
                     lambda x: '{:,.2f}'.format(
                         float(str(round(x, 2)))) if not pd.isna(x) or x != 0 else 'Não se aplica')
@@ -441,7 +465,7 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
 
                 geodf['text'] = geodf["text"].str.replace('*', ',')
 
-                min_ideb = geodf['PER_CAPITA_anual_2020'].min()
+                min_percapita = geodf['PER_CAPITA_anual_2020'].min()
                 fig = go.Figure(data=go.Choropleth(
                     geojson=json.loads(geodf.geometry.to_json()),
                     locations=geodf.index,
@@ -451,7 +475,7 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                     text=geodf['text'],  # hover text
                     hoverinfo='text',
                     colorbar_title="Gastos Per Capita 2020",
-                    zmin=min_ideb,
+                    zmin=min_percapita,
                     zmax=geodf['PER_CAPITA_anual_2020'].max(),
                 ))
                 fig.update_geos(fitbounds="locations", visible=False,
@@ -463,6 +487,88 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                                   plot_bgcolor=colors['chart_background'],
                                   paper_bgcolor=colors['chart_background']
                                   )
+
+            else:
+                if tipografico == "gastos2":
+                    geodf = dfDadosDistritos
+                    geodf['VALOR_TOTAL_ANUAL'] = geodf['VALOR_TOTAL_ANUAL'].apply(
+                        lambda x: round(x, 2) if not pd.isnull(x) else 0)
+
+                    geodf['geometry'] = geodf['geometry'].to_crs(epsg=4669)
+                    geodf['text'] = geodf['ds_nome'] + ':<br>Gasto: ' \
+                                    + geodf['VALOR_TOTAL_ANUAL'].apply(
+                        lambda x: '{:,.2f}'.format(
+                            float(str(round(x, 2)))) if not pd.isna(x) or x != 0 else 'Não se aplica')
+
+                    geodf['text'] = geodf["text"].str.replace('.', '*')
+
+                    geodf['text'] = geodf["text"].str.replace(',', '.')
+
+                    geodf['text'] = geodf["text"].str.replace('*', ',')
+
+                    min_gastoAbsol = geodf['VALOR_TOTAL_ANUAL'].min()
+                    fig = go.Figure(data=go.Choropleth(
+                        geojson=json.loads(geodf.geometry.to_json()),
+                        locations=geodf.index,
+                        z=geodf['VALOR_TOTAL_ANUAL'],
+                        colorscale='Reds',
+                        autocolorscale=False,
+                        text=geodf['text'],  # hover text
+                        hoverinfo='text',
+                        colorbar_title="Gasto Absoluto 2020",
+                        zmin=min_gastoAbsol,
+                        zmax=geodf['VALOR_TOTAL_ANUAL'].max(),
+                    ))
+                    fig.update_geos(fitbounds="locations", visible=False,
+                                    bgcolor=colors['chart_background'], scope="south america")
+                    fig.update_layout(margin=dict(l=0, r=0, t=50, b=0),
+                                      showlegend=False,
+                                      height=513,
+                                      title="Gastos Absoluto por Distrito (2020)",
+                                      plot_bgcolor=colors['chart_background'],
+                                      paper_bgcolor=colors['chart_background']
+                                      )
+
+                else:
+                    if tipografico == "ubs":
+                        geodf = dfDadosDistritos
+                        geodf['REMUNERACAO_BRUTA_UBS'] = geodf['REMUNERACAO_BRUTA_UBS'].apply(
+                            lambda x: round(x, 2) if not pd.isnull(x) else 0)
+
+                        geodf['geometry'] = geodf['geometry'].to_crs(epsg=4669)
+                        geodf['text'] = geodf['ds_nome'] + ':<br>Gasto: ' \
+                                        + geodf['REMUNERACAO_BRUTA_UBS'].apply(
+                            lambda x: '{:,.2f}'.format(
+                                float(str(round(x, 2)))) if not pd.isna(x) or x != 0 else 'Não se aplica')
+
+                        geodf['text'] = geodf["text"].str.replace('.', '*')
+
+                        geodf['text'] = geodf["text"].str.replace(',', '.')
+
+                        geodf['text'] = geodf["text"].str.replace('*', ',')
+
+                        min_gastoUBS = geodf['REMUNERACAO_BRUTA_UBS'].min()
+                        fig = go.Figure(data=go.Choropleth(
+                            geojson=json.loads(geodf.geometry.to_json()),
+                            locations=geodf.index,
+                            z=geodf['REMUNERACAO_BRUTA_UBS'],
+                            colorscale='Reds',
+                            autocolorscale=False,
+                            text=geodf['text'],  # hover text
+                            hoverinfo='text',
+                            colorbar_title="Gastos",
+                            zmin=min_gastoUBS,
+                            zmax=geodf['REMUNERACAO_BRUTA_UBS'].max(),
+                        ))
+                        fig.update_geos(fitbounds="locations", visible=False,
+                                        bgcolor=colors['chart_background'], scope="south america")
+                        fig.update_layout(margin=dict(l=0, r=0, t=50, b=0),
+                                          showlegend=False,
+                                          height=513,
+                                          title="Remuneração Bruta de UBS",
+                                          plot_bgcolor=colors['chart_background'],
+                                          paper_bgcolor=colors['chart_background']
+                                          )
 
         #################################################
 
@@ -509,11 +615,11 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                                        color="secondary",
                                        n_clicks=0,
                                        style={"margin-left": "5px"}),
-                            dbc.Button("Regionalização",
-                                       id='btn-regionalizacao',
-                                       color="secondary",
-                                       n_clicks=0,
-                                       style={"margin-left": "5px"}),
+                            # dbc.Button("Regionalização",
+                            #            id='btn-regionalizacao',
+                            #            color="secondary",
+                            #            n_clicks=0,
+                            #            style={"margin-left": "5px"}),
                         ]),
                         #
                         # dbc.Col([
@@ -582,7 +688,8 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                                     options=[{'label': 'Ideb', 'value': 'ideb'},
                                              {'label': 'Idep', 'value': 'idep'},
                                              {'label': 'EJA', 'value': 'eja'},
-                                             {'label': 'Gastos', 'value': 'gastos'},
+                                             {'label': 'Gastos Per Capita', 'value': 'gastos1'},
+                                             {'label': 'Gasto Absoluto', 'value': 'gastos2'},
                                              {'label': 'Taxa de Abandono', 'value': 'abandono'},
                                              {'label': 'Universalização', 'value': 'universalizacao'}],
                                     placeholder='Escolha um indicador',
@@ -592,7 +699,7 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                             dbc.Collapse(
                                 dcc.Dropdown(
                                     id='dpSaude',
-                                    options=[{'label': 'Em desenvolvimento', 'value': 'saude1'},
+                                    options=[{'label': 'Remuneração Bruta de UBS', 'value': 'ubs'},
                                              ],
                                     placeholder='Escolha um indicador',
                                     style={'backgroundColor': colors['background']}),
@@ -607,14 +714,14 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                                     style={'backgroundColor': colors['background']}),
                                 id="colUrbanismo", is_open=False),
 
-                            dbc.Collapse(
-                                dcc.Dropdown(
-                                    id='dpRegionalizacao',
-                                    options=[{'label': 'Gastos', 'value': 'gastos'},
-                                             ],
-                                    placeholder='Escolha um indicador',
-                                    style={'backgroundColor': colors['background']}),
-                                id="colRegionalizacao", is_open=False),
+                            # dbc.Collapse(
+                            #     dcc.Dropdown(
+                            #         id='dpRegionalizacao',
+                            #         options=[{'label': 'Gastos', 'value': 'gastos'},
+                            #                  ],
+                            #         placeholder='Escolha um indicador',
+                            #         style={'backgroundColor': colors['background']}),
+                            #     id="colRegionalizacao", is_open=False),
 
                         ], md=9),
 
@@ -688,9 +795,9 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                     dbc.CardBody([
                         html.H6("Gasto por Distrito", className="card-title"),
                         html.Div(style={'backgroundColor': colors['background'], 'color': colors['text']},
-                                 id="divTabelaGastos2019", children=[
-                                dash_table.DataTable(id="tabelagastos2019",
-                                                     data=dfTabelaGastos_2019.to_dict('records'),
+                                 id="divTabelaGastosPerCapita", children=[
+                                dash_table.DataTable(id="tabelagastosPerCapita",
+                                                     data=dfTabelaGastos_PerCapita.to_dict('records'),
                                                      sort_action='native',
                                                      style_table={'height': '350px', 'overflowY': 'auto'},
                                                      style_header={'fontSize': 13, 'font-family': 'arial',
@@ -710,13 +817,83 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                                                              group_delimiter=".",
                                                              decimal_delimiter=",",
                                                          )}
-                                                         for c in dfTabelaGastos_2019.columns])
+                                                         for c in dfTabelaGastos_PerCapita.columns])
 
                             ]),
 
                     ])
                 ], color="dark", outline=True),
-                id="collapseTabelaGastos2019", is_open=False),
+                id="collapseTabelaGastosPerCapita", is_open=False),
+
+            dbc.Collapse(
+                dbc.Card(style={'backgroundColor': colors['background'], 'color': colors['topic_text']}, children=[
+                    dbc.CardBody([
+                        html.H6("Gasto por Distrito", className="card-title"),
+                        html.Div(style={'backgroundColor': colors['background'], 'color': colors['text']},
+                                 id="divTabelaGastosAbsoluto", children=[
+                                dash_table.DataTable(id="tabelagastosAbsoluto",
+                                                     data=dfTabelaGastos_Absoluto.to_dict('records'),
+                                                     sort_action='native',
+                                                     style_table={'height': '350px', 'overflowY': 'auto'},
+                                                     style_header={'fontSize': 13, 'font-family': 'arial',
+                                                                   'fontWeight': 'bold'},
+                                                     style_cell={'backgroundColor': colors['table_cell'],
+                                                                 'color': colors['table_text'],
+                                                                 'textAlign': 'left',
+                                                                 'width': '85px',
+                                                                 'whiteSpace': 'normal', 'fontSize': 13,
+                                                                 'font-family': 'arial'},
+                                                     columns=[
+                                                         {'id': c, 'name': c, 'type': 'numeric', 'format': Format(
+                                                             scheme=Scheme.fixed,
+                                                             precision=2,
+                                                             group=Group.yes,
+                                                             groups=3,
+                                                             group_delimiter=".",
+                                                             decimal_delimiter=",",
+                                                         )}
+                                                         for c in dfTabelaGastos_Absoluto.columns])
+
+                            ]),
+
+                    ])
+                ], color="dark", outline=True),
+                id="collapseTabelaGastosAbsoluto", is_open=False),
+
+            dbc.Collapse(
+                dbc.Card(style={'backgroundColor': colors['background'], 'color': colors['topic_text']}, children=[
+                    dbc.CardBody([
+                        html.H6("Gasto por Distrito", className="card-title"),
+                        html.Div(style={'backgroundColor': colors['background'], 'color': colors['text']},
+                                 id="divTabelaGastosUBS", children=[
+                                dash_table.DataTable(id="tabelagastosUBS",
+                                                     data=dfTabelaGastos_UBS.to_dict('records'),
+                                                     sort_action='native',
+                                                     style_table={'height': '350px', 'overflowY': 'auto'},
+                                                     style_header={'fontSize': 13, 'font-family': 'arial',
+                                                                   'fontWeight': 'bold'},
+                                                     style_cell={'backgroundColor': colors['table_cell'],
+                                                                 'color': colors['table_text'],
+                                                                 'textAlign': 'left',
+                                                                 'width': '85px',
+                                                                 'whiteSpace': 'normal', 'fontSize': 13,
+                                                                 'font-family': 'arial'},
+                                                     columns=[
+                                                         {'id': c, 'name': c, 'type': 'numeric', 'format': Format(
+                                                             scheme=Scheme.fixed,
+                                                             precision=2,
+                                                             group=Group.yes,
+                                                             groups=3,
+                                                             group_delimiter=".",
+                                                             decimal_delimiter=",",
+                                                         )}
+                                                         for c in dfTabelaGastos_UBS.columns])
+
+                            ]),
+
+                    ])
+                ], color="dark", outline=True),
+                id="collapseTabelaGastosUBS", is_open=False),
 
             dbc.Collapse(
 
@@ -873,13 +1050,14 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
     Output('colEducacao', 'is_open'),
     Output('colSaude', 'is_open'),
     Output('colUrbanismo', 'is_open'),
-    Output('colRegionalizacao', 'is_open'),
+    # Output('colRegionalizacao', 'is_open'),
     [Input('btn-educacao', 'n_clicks'),
      Input('btn-saude', 'n_clicks'),
      Input('btn-urbanismo', 'n_clicks'),
-     Input('btn-regionalizacao', 'n_clicks')]
+     # Input('btn-regionalizacao', 'n_clicks')
+     ]
              )
-def displayClick(btn1, btn2, btn3, btn4):
+def displayClick(btn1, btn2, btn3): # btn4
     """Torna os botões da aplicação interativos retornando os dropdowns
     que aparecem ao clicar neles.
 
@@ -890,7 +1068,7 @@ def displayClick(btn1, btn2, btn3, btn4):
     m_dropdown_educacao = False
     m_dropdown_saude = False
     m_dropdown_urbanismo = False
-    m_dropdown_regionalizacao = False
+    # m_dropdown_regionalizacao = False
 
     if 'btn-educacao' in changed_id:
         m_dropdown_educacao = True
@@ -898,12 +1076,12 @@ def displayClick(btn1, btn2, btn3, btn4):
         m_dropdown_saude = True
     elif 'btn-urbanismo' in changed_id:
         m_dropdown_urbanismo = True
-    elif 'btn-regionalizacao' in changed_id:
-        m_dropdown_regionalizacao = True
+    # elif 'btn-regionalizacao' in changed_id:
+    #     m_dropdown_regionalizacao = True
     else:
         pass
 
-    return m_dropdown_educacao, m_dropdown_saude, m_dropdown_urbanismo, m_dropdown_regionalizacao
+    return m_dropdown_educacao, m_dropdown_saude, m_dropdown_urbanismo # , m_dropdown_regionalizacao
 
 
 #####################################################################
@@ -929,22 +1107,26 @@ def displayClick(btn1, btn2, btn3, btn4):
               Output("colApresentacaoDireita", "is_open"),
               Output("collapseTabelaDistrito", "is_open"),
               Output("collapseTabelaSubprefeitura", "is_open"),
-              Output("collapseTabelaGastos2019", "is_open"),
+              Output("collapseTabelaGastosPerCapita", "is_open"),
+              Output("collapseTabelaGastosAbsoluto", "is_open"),
               Output("collapseTabelaEja", "is_open"),
+              Output("collapseTabelaGastosUBS", "is_open"),
               Input("dpEducacao", "value"),
-              Input("dpRegionalizacao", "value"),
+              Input("dpSaude", "value"),
+              # Input("dpRegionalizacao", "value"),
               Input("optdados", "value"),
               Input("optanos", "value"),
               Input("optuniversalizacao", "value"),
               Input("sliderEja", "value")
               )
-def displayMapa(indicadores_educacao, indicadores_regionalizacao, dados, anos, anos_universalizacao, sliderEja):
+
+def displayMapa(indicadores_educacao, indicadores_saude, dados, anos, anos_universalizacao, sliderEja):  # indicadores_regionalizacao
     """Exibe os mapas e/ou gráficos gerados de acordo com os botões clicados, retornando
     as figuras de acordo.
 
     Variable type: String
 
-    Options: 'ideb', 'idep', 'abandono', 'universalizacao', 'gastos' ou 'eja'"""
+    Options: 'ideb', 'idep', 'abandono', 'universalizacao', 'gastos1', 'gastos2' ou 'eja'"""
 
     user_click = dash.callback_context.triggered[0]['prop_id'].split('.')[0]
     colapseddivistritossubpreituras = False
@@ -954,8 +1136,10 @@ def displayMapa(indicadores_educacao, indicadores_regionalizacao, dados, anos, a
     collapseGraficosDireita = False
     collapseTabelaDistrito = False
     collapseTabelaSubprefeitura = False
-    collapseTabelaGastos2019 = False
+    collapseTabelaGastosPerCapita = False
+    collapseTabelaGastosAbsoluto = False
     collapseTabelaEja = False
+    collapseTabelaGastosUBS = False
     card_Apresentacao_Direita = True
     fig = go.Figure()
     fig2 = go.Figure()
@@ -991,233 +1175,218 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
     Para mais informações sobre o Índice de Desenvolvimento da Educação Paulistana (IDEP) consulte a Nota Técnica que acompanha este Conjunto de Dados (disponível para download em:  http://dados.prefeitura.sp.gov.br/dataset/idep ).
     Obs: Os dados com * indicam que a escola não atendeu a um dos critérios necessários para o cálculo do Idep ou das suas metas."'''
 
-    if indicadores_educacao is not None:
-        if indicadores_educacao == "ideb":
-            # Cria mapa e gráfico de linhas
-            fig = gerar_mapa("ideb", anos, dados)
+    if user_click == "dpEducacao":
+        if indicadores_educacao is not None:
+            if indicadores_educacao == "ideb":
+                # Cria mapa e gráfico de linhas
+                fig = gerar_mapa("ideb", anos, dados)
 
-            ########################################################
+                ########################################################
 
-            colapseddivistritossubpreituras = True
-            collapsedivdanos = True
-            collapseGraficosEsquerda = True
-            collapseGraficosDireita = True
-            card_Apresentacao_Direita = False
-            divGrafDireita = {"display": "block"}
-            # divEsquerdaSup = {"display": "block"}
-            divInfo = {"display": "block"}
-            info = info_ideb
-            info_header = "Indicador - IDEB"
-
-            if dados is not None:
-                if dados == "distrito":
-                    collapseTabelaDistrito = True
-                else:
-                    collapseTabelaSubprefeitura = True
-
-        else:
-            if indicadores_educacao == "idep":
-                labels = ['Faixa 1', 'Faixa 2', 'Faixa 3', 'Faixa 4', 'Faixa 5', 'Faixa 6']
-                values = [17, 13, 45, 21, 3, 1]
-
-                fig2 = go.Figure(data=[go.Pie(labels=labels, values=values)])
-                fig2.update_layout(margin=dict(l=0, r=0, t=50, b=0),
-                                   autosize=True,
-                                   title="Percentual de escolas por faixa do IDEP <br> Anos Iniciais (2019)",
-                                   plot_bgcolor=colors['chart_background'],
-                                   paper_bgcolor=colors['chart_background']
-                                   )
-                colors_fig2 = ['rgb (230,159,0)', 'rgb (86,180,233)', 'rgb (0,158,115)', 'rgb (240,228,66)',
-                               'rgb (0,114,178)', 'rgb (213,94,0)']
-                fig2.update_traces(marker=dict(colors=colors_fig2, line=dict(color='#000000', width=1)))
-
-                dfBarra = pd.read_csv("data/idep_barras_iniciais.csv",
-                                      sep=";",
-                                      decimal=",")
-                fig = px.bar(dfBarra, y="Distrito",
-                             x=["Faixa 1", "Faixa 2", "Faixa 3", "Faixa 4", "Faixa 5", "Faixa 6"],
-                             orientation='h', title="Distribuição das escolas por faixa do Idep por Distrito (2019)",
-                             height=1200)
-                fig.update_layout(font_size=10, yaxis={'categoryorder': 'category descending'},
-                                  plot_bgcolor=colors['chart_background'],
-                                  paper_bgcolor=colors['chart_background']
-                                  )
-
-                labels = ['Não Atingiram', 'Atingiram']
-                values = [15.50, 84.50]
-
-                fig3 = go.Figure(data=[go.Pie(labels=labels, values=values)])
-                fig3.update_layout(margin=dict(l=0, r=0, t=50, b=0),
-                                   autosize=True,
-                                   showlegend=True,
-                                   title="Escolas que atingiram a meta do IDEP <br> Anos Iniciais (2019)",
-                                   plot_bgcolor=colors['chart_background'],
-                                   paper_bgcolor=colors['chart_background']
-                                   )
-                colors_fig3 = ['orange', 'skyblue']
-                fig3.update_traces(marker=dict(colors=colors_fig3, line=dict(color='#000000', width=1)))
-
-                labels = ['Não Atingiram', 'Atingiram']
-                values = [65.3, 34.7]
-
-                fig4 = go.Figure(data=[go.Pie(labels=labels, values=values)])
-                fig4.update_layout(margin=dict(l=0, r=0, t=50, b=0),
-                                   autosize=True,
-                                   showlegend=True,
-                                   title="Escolas que atingiram a meta do IDEP <br> Anos Finais (2019)",
-                                   plot_bgcolor=colors['chart_background'],
-                                   paper_bgcolor=colors['chart_background']
-                                   )
-                colors_fig4 = ['orange', 'skyblue']
-                fig4.update_traces(marker=dict(colors=colors_fig4, line=dict(color='#000000', width=1)))
-
-                divEsquerdaSup = {"display": "block"}
-                divEsquerdaInf = {"display": "block"}
-                divEsquerdaInf2 = {"display": "block"}
-                divGrafDireita = {"display": "block"}
-                divInfo = {"display": "block"}
-                info = info_idep
-                info_header = "Indicador - IDEP"
+                colapseddivistritossubpreituras = True
+                collapsedivdanos = True
                 collapseGraficosEsquerda = True
                 collapseGraficosDireita = True
                 card_Apresentacao_Direita = False
+                divGrafDireita = {"display": "block"}
+                # divEsquerdaSup = {"display": "block"}
+                divInfo = {"display": "block"}
+                info = info_ideb
+                info_header = "Indicador - IDEB"
+
+                if dados is not None:
+                    if dados == "distrito":
+                        collapseTabelaDistrito = True
+                    else:
+                        collapseTabelaSubprefeitura = True
 
             else:
+                if indicadores_educacao == "idep":
+                    labels = ['Faixa 1', 'Faixa 2', 'Faixa 3', 'Faixa 4', 'Faixa 5', 'Faixa 6']
+                    values = [17, 13, 45, 21, 3, 1]
 
-                if indicadores_educacao == "abandono":
-                    df = pd.read_csv("data/evasao_linha.csv",
-                                     sep=";",
-                                     decimal=",")
-
-                    fig2.add_trace(go.Scatter(
-                        x=df.Ano, y=df.taxa, mode="markers", line_shape='linear',
-                        marker_color=df.taxa, text=df.Ano, marker=dict(showscale=True)
-                    ))
-                    fig2.update_traces(marker_line_width=2, marker_size=10)
-
-                    datah = [go.Scatter(x=df["Ano"], y=df["taxa"], hoverinfo="none", hovertext="")]
-
-                    fig2 = go.Figure(data=datah)
-
-                    # fig2 = go.Figure(layout={"template": "plotly_dark"})
-                    fig2.layout.update(showlegend=False)
-                    fig2.add_trace(go.Scatter(x=df["Ano"], y=df["taxa"]))
-                    fig2.update_traces(marker_line_width=2, marker_size=3, mode="markers+lines")
-                    fig2.update_layout(margin=dict(l=0, r=0, t=50, b=0), autosize=True,
-                                       title="Taxa de abandono Ensino Fundamental",
+                    fig2 = go.Figure(data=[go.Pie(labels=labels, values=values)])
+                    fig2.update_layout(margin=dict(l=0, r=0, t=50, b=0),
+                                       autosize=True,
+                                       title="Percentual de escolas por faixa do IDEP <br> Anos Iniciais (2019)",
                                        plot_bgcolor=colors['chart_background'],
                                        paper_bgcolor=colors['chart_background']
                                        )
-                    fig2.update_xaxes(showline=True, linewidth=2, linecolor='black', gridcolor='black')
-                    fig2.update_yaxes(showline=True, linewidth=2, linecolor='black', gridcolor='black')
-                    # fig.update_layout(font_size=10, yaxis={'categoryorder': 'category descending'})
+                    colors_fig2 = ['rgb (230,159,0)', 'rgb (86,180,233)', 'rgb (0,158,115)', 'rgb (240,228,66)',
+                                   'rgb (0,114,178)', 'rgb (213,94,0)']
+                    fig2.update_traces(marker=dict(colors=colors_fig2, line=dict(color='#000000', width=1)))
+
+                    dfBarra = pd.read_csv("data/idep_barras_iniciais.csv",
+                                          sep=";",
+                                          decimal=",")
+                    fig = px.bar(dfBarra, y="Distrito",
+                                 x=["Faixa 1", "Faixa 2", "Faixa 3", "Faixa 4", "Faixa 5", "Faixa 6"],
+                                 orientation='h', title="Distribuição das escolas por faixa do Idep por Distrito (2019)",
+                                 height=1200)
+                    fig.update_layout(font_size=10, yaxis={'categoryorder': 'category descending'},
+                                      plot_bgcolor=colors['chart_background'],
+                                      paper_bgcolor=colors['chart_background']
+                                      )
+
+                    labels = ['Não Atingiram', 'Atingiram']
+                    values = [15.50, 84.50]
+
+                    fig3 = go.Figure(data=[go.Pie(labels=labels, values=values)])
+                    fig3.update_layout(margin=dict(l=0, r=0, t=50, b=0),
+                                       autosize=True,
+                                       showlegend=True,
+                                       title="Escolas que atingiram a meta do IDEP <br> Anos Iniciais (2019)",
+                                       plot_bgcolor=colors['chart_background'],
+                                       paper_bgcolor=colors['chart_background']
+                                       )
+                    colors_fig3 = ['orange', 'skyblue']
+                    fig3.update_traces(marker=dict(colors=colors_fig3, line=dict(color='#000000', width=1)))
+
+                    labels = ['Não Atingiram', 'Atingiram']
+                    values = [65.3, 34.7]
+
+                    fig4 = go.Figure(data=[go.Pie(labels=labels, values=values)])
+                    fig4.update_layout(margin=dict(l=0, r=0, t=50, b=0),
+                                       autosize=True,
+                                       showlegend=True,
+                                       title="Escolas que atingiram a meta do IDEP <br> Anos Finais (2019)",
+                                       plot_bgcolor=colors['chart_background'],
+                                       paper_bgcolor=colors['chart_background']
+                                       )
+                    colors_fig4 = ['orange', 'skyblue']
+                    fig4.update_traces(marker=dict(colors=colors_fig4, line=dict(color='#000000', width=1)))
 
                     divEsquerdaSup = {"display": "block"}
-                    divEsquerdaInf = {"display": "none"}
+                    divEsquerdaInf = {"display": "block"}
+                    divEsquerdaInf2 = {"display": "block"}
                     divGrafDireita = {"display": "block"}
                     divInfo = {"display": "block"}
+                    info = info_idep
+                    info_header = "Indicador - IDEP"
                     collapseGraficosEsquerda = True
                     collapseGraficosDireita = True
                     card_Apresentacao_Direita = False
 
-                    df = pd.read_csv("data/evasao_barra.csv",
-                                     sep=";",
-                                     decimal=",")
-                    df['taxa'] = pd.to_numeric(df['taxa'], errors='coerce')
-                    df = df.sort_values("taxa")
-                    fig = px.bar(df, y="Distrito", x="taxa",
-                                 orientation='h',
-                                 title="Taxa de abandono no Ensino Fundamental(%)")
-                    fig.update_layout(margin=dict(l=0, r=0, t=50, b=0), height=1200, font_size=11,
-                                      plot_bgcolor=colors['chart_background'],
-                                      paper_bgcolor=colors['chart_background']
-                                      )
-                    # fig.update_layout(font_size=10, yaxis={'categoryorder': 'category descending'})
-                    info = "abandono"
-                    info_header = "Indicador - Taxa de Abandono"
-
                 else:
 
-                    if indicadores_educacao == "universalizacao":
+                    if indicadores_educacao == "abandono":
+                        df = pd.read_csv("data/evasao_linha.csv",
+                                         sep=";",
+                                         decimal=",")
 
-                        def custom_legend_name(new_names):
-                            """Gera nomes customizados na legenda do gráfico de linhas da fig3 do Indicador de Universalização
+                        fig2.add_trace(go.Scatter(
+                            x=df.Ano, y=df.taxa, mode="markers", line_shape='linear',
+                            marker_color=df.taxa, text=df.Ano, marker=dict(showscale=True)
+                        ))
+                        fig2.update_traces(marker_line_width=2, marker_size=10)
 
-                            Variable type: list"""
+                        datah = [go.Scatter(x=df["Ano"], y=df["taxa"], hoverinfo="none", hovertext="")]
 
-                            for i, new_name in enumerate(new_names):
-                                fig3.data[i].name = new_name
+                        fig2 = go.Figure(data=datah)
 
-                        ####################
-
-                        # fig = gerar_mapa("universalizacao", anos, "dist_universalizacao", anos_universalizacao)
-                        dfLineRME = pd.read_csv("data/universalizacao_evol_matr_rme_15-20.csv",
-                                                sep=";",
-                                                decimal=",")
-                        fig = px.line(dfLineRME,
-                                      x="Ano",
-                                      y="Matriculas",
-                                      title='Matrículas na Pré-Escola da Rede Municipal de Ensino')
-                        fig.update_layout(xaxis={'title': 'Ano'},
-                                          yaxis={'title': 'Matrículas'},
-                                          plot_bgcolor=colors['chart_background'],
-                                          paper_bgcolor=colors['chart_background']
-                                          )
-                        fig.update_traces(mode="markers+lines")
-
-                        ####################
-
-                        dfLine = pd.read_csv("data/universalizacao_evol_indic_mun_15-20.csv",
-                                             sep=";",
-                                             decimal=",")
-                        fig2 = px.line(dfLine,
-                                       x="Ano",
-                                       y="Taxa",
-                                       title='Taxa de Universalização da Educação Infantil <br> (somente pré-escola) (%)')
-                        fig2.update_layout(yaxis_range=[88, 100],
-                                           xaxis={'title': 'Ano'},
-                                           yaxis={'title': 'Taxa (%)'},
+                        # fig2 = go.Figure(layout={"template": "plotly_dark"})
+                        fig2.layout.update(showlegend=False)
+                        fig2.add_trace(go.Scatter(x=df["Ano"], y=df["taxa"]))
+                        fig2.update_traces(marker_line_width=2, marker_size=3, mode="markers+lines")
+                        fig2.update_layout(margin=dict(l=0, r=0, t=50, b=0), autosize=True,
+                                           title="Taxa de abandono Ensino Fundamental",
                                            plot_bgcolor=colors['chart_background'],
                                            paper_bgcolor=colors['chart_background']
                                            )
-                        fig2.update_traces(mode="markers+lines")
-
-                        dfLine2 = pd.read_csv("data/universalizacao_evol_var_mun_15-20.csv",
-                                              sep=";",
-                                              decimal=",")
-                        fig3 = px.line(dfLine2,
-                                       x="Ano",
-                                       y=["Matriculas", "Populacao"],
-                                       title='Taxa de Universalização da Educação Infantil <br> (somente pré-escola)')
-                        custom_legend_name(['Matrículas<br>(todas as redes)', 'População<br>(4 e 5 anos)'])
-                        fig3.update_layout(yaxis_range=[280000, 350000],
-                                           xaxis={'title': 'Ano'},
-                                           yaxis={'title': 'Taxa'},
-                                           legend=dict(orientation="h",
-                                                       yanchor="bottom",
-                                                       y=-0.4, xanchor="right",
-                                                       x=1),
-                                           legend_title_text='',
-                                           plot_bgcolor=colors['chart_background'],
-                                           paper_bgcolor=colors['chart_background']
-                                           )
-                        fig3.update_traces(mode="markers+lines")
+                        fig2.update_xaxes(showline=True, linewidth=2, linecolor='black', gridcolor='black')
+                        fig2.update_yaxes(showline=True, linewidth=2, linecolor='black', gridcolor='black')
+                        # fig.update_layout(font_size=10, yaxis={'categoryorder': 'category descending'})
 
                         divEsquerdaSup = {"display": "block"}
-                        divEsquerdaInf = {"display": "block"}
+                        divEsquerdaInf = {"display": "none"}
                         divGrafDireita = {"display": "block"}
                         divInfo = {"display": "block"}
-                        info = info_idep
-                        info_header = "Indicador - IDEP"
                         collapseGraficosEsquerda = True
                         collapseGraficosDireita = True
                         card_Apresentacao_Direita = False
-                        card_universalizacao = True
+
+                        df = pd.read_csv("data/evasao_barra.csv",
+                                         sep=";",
+                                         decimal=",")
+                        df['taxa'] = pd.to_numeric(df['taxa'], errors='coerce')
+                        df = df.sort_values("taxa")
+                        fig = px.bar(df, y="Distrito", x="taxa",
+                                     orientation='h',
+                                     title="Taxa de abandono no Ensino Fundamental(%)")
+                        fig.update_layout(margin=dict(l=0, r=0, t=50, b=0), height=1200, font_size=11,
+                                          plot_bgcolor=colors['chart_background'],
+                                          paper_bgcolor=colors['chart_background']
+                                          )
+                        # fig.update_layout(font_size=10, yaxis={'categoryorder': 'category descending'})
+                        info = "abandono"
+                        info_header = "Indicador - Taxa de Abandono"
 
                     else:
 
-                        if indicadores_educacao == "gastos":
-                            fig = gerar_mapa("gastos", anos, "", 0)
+                        if indicadores_educacao == "universalizacao":
+
+                            def custom_legend_name(new_names):
+                                """Gera nomes customizados na legenda do gráfico de linhas da fig3 do Indicador de Universalização
+
+                                Variable type: list"""
+
+                                for i, new_name in enumerate(new_names):
+                                    fig3.data[i].name = new_name
+
+                            ####################
+
+                            # fig = gerar_mapa("universalizacao", anos, "dist_universalizacao", anos_universalizacao)
+                            dfLineRME = pd.read_csv("data/universalizacao_evol_matr_rme_15-20.csv",
+                                                    sep=";",
+                                                    decimal=",")
+                            fig = px.line(dfLineRME,
+                                          x="Ano",
+                                          y="Matriculas",
+                                          title='Matrículas na Pré-Escola da Rede Municipal de Ensino')
+                            fig.update_layout(xaxis={'title': 'Ano'},
+                                              yaxis={'title': 'Matrículas'},
+                                              plot_bgcolor=colors['chart_background'],
+                                              paper_bgcolor=colors['chart_background']
+                                              )
+                            fig.update_traces(mode="markers+lines")
+
+                            ####################
+
+                            dfLine = pd.read_csv("data/universalizacao_evol_indic_mun_15-20.csv",
+                                                 sep=";",
+                                                 decimal=",")
+                            fig2 = px.line(dfLine,
+                                           x="Ano",
+                                           y="Taxa",
+                                           title='Taxa de Universalização da Educação Infantil <br> (somente pré-escola) (%)')
+                            fig2.update_layout(yaxis_range=[88, 100],
+                                               xaxis={'title': 'Ano'},
+                                               yaxis={'title': 'Taxa (%)'},
+                                               plot_bgcolor=colors['chart_background'],
+                                               paper_bgcolor=colors['chart_background']
+                                               )
+                            fig2.update_traces(mode="markers+lines")
+
+                            dfLine2 = pd.read_csv("data/universalizacao_evol_var_mun_15-20.csv",
+                                                  sep=";",
+                                                  decimal=",")
+                            fig3 = px.line(dfLine2,
+                                           x="Ano",
+                                           y=["Matriculas", "Populacao"],
+                                           title='Taxa de Universalização da Educação Infantil <br> (somente pré-escola)')
+                            custom_legend_name(['Matrículas<br>(todas as redes)', 'População<br>(4 e 5 anos)'])
+                            fig3.update_layout(yaxis_range=[280000, 350000],
+                                               xaxis={'title': 'Ano'},
+                                               yaxis={'title': 'Taxa'},
+                                               legend=dict(orientation="h",
+                                                           yanchor="bottom",
+                                                           y=-0.4, xanchor="right",
+                                                           x=1),
+                                               legend_title_text='',
+                                               plot_bgcolor=colors['chart_background'],
+                                               paper_bgcolor=colors['chart_background']
+                                               )
+                            fig3.update_traces(mode="markers+lines")
 
                             divEsquerdaSup = {"display": "block"}
                             divEsquerdaInf = {"display": "block"}
@@ -1225,116 +1394,170 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                             divInfo = {"display": "block"}
                             info = info_idep
                             info_header = "Indicador - IDEP"
+                            collapseGraficosEsquerda = True
                             collapseGraficosDireita = True
                             card_Apresentacao_Direita = False
-                            collapseTabelaGastos2019 = True
+                            card_universalizacao = True
 
                         else:
 
-                            if indicadores_educacao == "eja":
-
-                                # dfEjaGenero = pd.read_excel("data/eja.xlsx",
-                                #                             sheet_name="gênero")
-
-                                labels = ['Feminino', 'Masculino']
-                                values = [16515, 25103]
-
-                                # fig2 = go.Figure(data=[go.Pie(labels=labels, values=values)])
-                                # fig2 = px.pie(dfEjaGenero,
-                                #               values='Gênero',
-                                #               names='Quantidade',
-                                #               title='Population of European continent')
-                                fig2 = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent',
-                                                              insidetextorientation='radial', hole=0.3
-                                                              )])
-                                fig2.update_layout(margin=dict(l=0, r=0, t=50, b=0), autosize=True,
-                                                   title="Percentual por Gênero",
-                                                   plot_bgcolor=colors['chart_background'],
-                                                   paper_bgcolor=colors['chart_background']
-                                                   )
-                                colors_fig2 = ['skyblue', 'orange']
-                                fig2.update_traces(marker=dict(colors=colors_fig2, line=dict(color='#000000', width=2)))
-
-                                dfEjaMatriculas = pd.read_csv("data/eja_matriculas2.csv",
-                                                                sep=";",
-                                                                decimal=",")
-
-                                dfSlider = dfEjaMatriculas.loc[(dfEjaMatriculas['Ano'] >= sliderEja[0]) &
-                                                               (dfEjaMatriculas['Ano'] <= sliderEja[1])]
-
-                                fig = px.line(dfSlider, x='Ano', y='Matrículas', color='Distrito',
-                                              height=600, width=600,
-                                              orientation="v",
-                                              title="EJA - Matrículas por Distrito")
-                                fig.update_layout(xaxis_tickformat='d',
-                                                  plot_bgcolor=colors['chart_background'],
-                                                  paper_bgcolor=colors['chart_background']
-                                                  )
-                                fig.update_xaxes(
-                                    showgrid=True,
-                                    ticks="outside",
-                                    tickson="boundaries",
-                                    ticklen=0
-                                )
-
-                                labels = ['Amarelo', 'Branco', 'Indígena', 'Não declarada',
-                                          'Parda', 'Preta', 'Recusou informar']
-                                values = [135, 11565, 87, 7907, 13767, 3906, 4273]
-
-                                fig3 = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent',
-                                                              insidetextorientation='radial')])
-                                fig3.update_layout(margin=dict(l=0, r=0, t=50, b=0), autosize=True, showlegend=True,
-                                                   title="Percentual por Raça",
-                                                   plot_bgcolor=colors['chart_background'],
-                                                   paper_bgcolor=colors['chart_background']
-                                                   )
-                                colors_fig3 = ['#f8f398', 'wheat', 'lightsalmon', 'dimgray', '#6f4e37', '#2c1608',
-                                               'gray']
-                                fig3.update_traces(marker=dict(colors=colors_fig3))
-
-                                labels = ['15-18', '19-25', '26-30', '31-40', '41-50', '51-60', '61-70', '71-94']
-                                values = [6332, 5411, 2679, 6091, 8856, 6994, 3540, 1711]
-
-                                fig4 = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent',
-                                                              insidetextorientation='auto')])
-                                fig4.update_layout(margin=dict(l=0, r=0, t=50, b=0), autosize=True, showlegend=True,
-                                                   title="Percentual por Idade",
-                                                   plot_bgcolor=colors['chart_background'],
-                                                   paper_bgcolor=colors['chart_background']
-                                                   )
-                                colors_fig4 = ['rgb (255,255,255)', 'rgb (230,159,0)', 'rgb (86,180,233)',
-                                               'rgb (0,158,115)', 'rgb (240,228,66)', 'rgb (0,114,178)',
-                                               'rgb (213,94,0)', 'rgb (204,121,167)']
-                                fig4.update_traces(marker=dict(colors=colors_fig4, line=dict(color='#000000', width=1)))
+                            if indicadores_educacao == "gastos1":
+                                fig = gerar_mapa("gastos1", anos, "", 0)
 
                                 divEsquerdaSup = {"display": "block"}
                                 divEsquerdaInf = {"display": "block"}
-                                divEsquerdaInf2 = {"display": "block"}
                                 divGrafDireita = {"display": "block"}
                                 divInfo = {"display": "block"}
-                                divSlider = {"display": "block"}
                                 info = info_idep
                                 info_header = "Indicador - IDEP"
-                                collapseGraficosEsquerda = True
                                 collapseGraficosDireita = True
                                 card_Apresentacao_Direita = False
-                                collapseTabelaEja = True
+                                collapseTabelaGastosPerCapita = True
 
-    else:
-        if indicadores_regionalizacao is not None:
-            pass
+                            else:
 
-        else:  # indicadores não escolhidos
-            return (go.Figure(), go.Figure(), go.Figure(), go.Figure(), collapsedivdanos,
-                    colapseddivistritossubpreituras, card_universalizacao, divEsquerdaSup, divEsquerdaInf,
-                    divEsquerdaInf2, divGrafDireita, info, divInfo, divSlider, info_header, collapseGraficosEsquerda,
-                    collapseGraficosDireita, card_Apresentacao_Direita, collapseTabelaDistrito,
-                    collapseTabelaSubprefeitura, collapseTabelaGastos2019, collapseTabelaEja)
+                                if indicadores_educacao == "eja":
+
+                                    # dfEjaGenero = pd.read_excel("data/eja.xlsx",
+                                    #                             sheet_name="gênero")
+
+                                    labels = ['Feminino', 'Masculino']
+                                    values = [16515, 25103]
+
+                                    # fig2 = go.Figure(data=[go.Pie(labels=labels, values=values)])
+                                    # fig2 = px.pie(dfEjaGenero,
+                                    #               values='Gênero',
+                                    #               names='Quantidade',
+                                    #               title='Population of European continent')
+                                    fig2 = go.Figure(data=[go.Pie(labels=labels, values=values,
+                                                                  textinfo='label+percent',
+                                                                  insidetextorientation='radial',
+                                                                  hole=0.3
+                                                                  )])
+                                    fig2.update_layout(margin=dict(l=0, r=0, t=50, b=0), autosize=True,
+                                                       title="Percentual por Gênero",
+                                                       plot_bgcolor=colors['chart_background'],
+                                                       paper_bgcolor=colors['chart_background']
+                                                       )
+                                    colors_fig2 = ['skyblue', 'orange']
+                                    fig2.update_traces(marker=dict(colors=colors_fig2,
+                                                                   line=dict(color='#000000', width=2)))
+
+                                    dfEjaMatriculas = pd.read_csv("data/eja_matriculas2.csv",
+                                                                  sep=";",
+                                                                  decimal=",")
+
+                                    dfSlider = dfEjaMatriculas.loc[(dfEjaMatriculas['Ano'] >= sliderEja[0]) &
+                                                                   (dfEjaMatriculas['Ano'] <= sliderEja[1])]
+
+                                    fig = px.line(dfSlider, x='Ano', y='Matrículas', color='Distrito',
+                                                  height=600, width=600,
+                                                  orientation="v",
+                                                  title="EJA - Matrículas por Distrito")
+                                    fig.update_layout(xaxis_tickformat='d',
+                                                      plot_bgcolor=colors['chart_background'],
+                                                      paper_bgcolor=colors['chart_background']
+                                                      )
+                                    fig.update_xaxes(
+                                        showgrid=True,
+                                        ticks="outside",
+                                        tickson="boundaries",
+                                        ticklen=0
+                                    )
+
+                                    labels = ['Amarelo', 'Branco', 'Indígena', 'Não declarada',
+                                              'Parda', 'Preta', 'Recusou informar']
+                                    values = [135, 11565, 87, 7907, 13767, 3906, 4273]
+
+                                    fig3 = go.Figure(data=[go.Pie(labels=labels, values=values,
+                                                                  textinfo='label+percent',
+                                                                  insidetextorientation='radial')])
+                                    fig3.update_layout(margin=dict(l=0, r=0, t=50, b=0), autosize=True, showlegend=True,
+                                                       title="Percentual por Raça",
+                                                       plot_bgcolor=colors['chart_background'],
+                                                       paper_bgcolor=colors['chart_background']
+                                                       )
+                                    colors_fig3 = ['#f8f398', 'wheat', 'lightsalmon', 'dimgray', '#6f4e37', '#2c1608',
+                                                   'gray']
+                                    fig3.update_traces(marker=dict(colors=colors_fig3))
+
+                                    labels = ['15-18', '19-25', '26-30', '31-40', '41-50', '51-60', '61-70', '71-94']
+                                    values = [6332, 5411, 2679, 6091, 8856, 6994, 3540, 1711]
+
+                                    fig4 = go.Figure(data=[go.Pie(labels=labels, values=values,
+                                                                  textinfo='label+percent',
+                                                                  insidetextorientation='auto')])
+                                    fig4.update_layout(margin=dict(l=0, r=0, t=50, b=0), autosize=True, showlegend=True,
+                                                       title="Percentual por Idade",
+                                                       plot_bgcolor=colors['chart_background'],
+                                                       paper_bgcolor=colors['chart_background']
+                                                       )
+                                    colors_fig4 = ['rgb (255,255,255)', 'rgb (230,159,0)', 'rgb (86,180,233)',
+                                                   'rgb (0,158,115)', 'rgb (240,228,66)', 'rgb (0,114,178)',
+                                                   'rgb (213,94,0)', 'rgb (204,121,167)']
+                                    fig4.update_traces(marker=dict(colors=colors_fig4, line=dict(color='#000000', width=1)))
+
+                                    divEsquerdaSup = {"display": "block"}
+                                    divEsquerdaInf = {"display": "block"}
+                                    divEsquerdaInf2 = {"display": "block"}
+                                    divGrafDireita = {"display": "block"}
+                                    divInfo = {"display": "block"}
+                                    divSlider = {"display": "block"}
+                                    info = info_idep
+                                    info_header = "Indicador - IDEP"
+                                    collapseGraficosEsquerda = True
+                                    collapseGraficosDireita = True
+                                    card_Apresentacao_Direita = False
+                                    collapseTabelaEja = True
+
+                                else:
+
+                                    if indicadores_educacao == 'gastos2':
+
+                                        fig = gerar_mapa("gastos2", anos, "", 0)
+
+                                        divEsquerdaSup = {"display": "block"}
+                                        divEsquerdaInf = {"display": "block"}
+                                        divGrafDireita = {"display": "block"}
+                                        divInfo = {"display": "block"}
+                                        info = info_idep
+                                        info_header = "Indicador - IDEP"
+                                        collapseGraficosDireita = True
+                                        card_Apresentacao_Direita = False
+                                        collapseTabelaGastosAbsoluto = True
+
+    elif user_click == "dpSaude":
+        if indicadores_saude is not None:
+            if indicadores_saude == 'ubs':
+                fig = gerar_mapa("ubs", anos, "", 0)
+
+                divEsquerdaSup = {"display": "block"}
+                divEsquerdaInf = {"display": "block"}
+                divGrafDireita = {"display": "block"}
+                divInfo = {"display": "block"}
+                info = info_idep
+                info_header = "Indicador - Saúde"
+                collapseGraficosDireita = True
+                card_Apresentacao_Direita = False
+                collapseTabelaGastosUBS = True
+
+    # elif user_click == "dpRegionalizacao":
+    #     if indicadores_regionalizacao is not None:
+    #         pass
+
+    else:  # indicadores não escolhidos
+        return (go.Figure(), go.Figure(), go.Figure(), go.Figure(), collapsedivdanos,
+                colapseddivistritossubpreituras, card_universalizacao, divEsquerdaSup, divEsquerdaInf,
+                divEsquerdaInf2, divGrafDireita, info, divInfo, divSlider, info_header, collapseGraficosEsquerda,
+                collapseGraficosDireita, card_Apresentacao_Direita, collapseTabelaDistrito,
+                collapseTabelaSubprefeitura, collapseTabelaGastosPerCapita, collapseTabelaGastosAbsoluto,
+                collapseTabelaEja, collapseTabelaGastosUBS)
 
     return (fig, fig2, fig3, fig4, collapsedivdanos, colapseddivistritossubpreituras, card_universalizacao,
             divEsquerdaSup, divEsquerdaInf, divEsquerdaInf2, divGrafDireita, info, divInfo, divSlider, info_header,
             collapseGraficosEsquerda, collapseGraficosDireita, card_Apresentacao_Direita, collapseTabelaDistrito,
-            collapseTabelaSubprefeitura, collapseTabelaGastos2019, collapseTabelaEja)
+            collapseTabelaSubprefeitura, collapseTabelaGastosPerCapita, collapseTabelaGastosAbsoluto,
+            collapseTabelaEja, collapseTabelaGastosUBS)
 
 
 def toggle_modal(n1, n2, is_open):
