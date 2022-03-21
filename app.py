@@ -120,6 +120,13 @@ dfTabelaGastos_Absoluto = dfTabelaGastos_Absoluto.rename(columns=
                                                          {'ds_nome': 'Nome', 'VALOR_TOTAL_ANUAL': 'Gastos'},
                                                          inplace=False)
 
+dfTabelaGastos_UBS = dfDadosDistritos[['ds_nome', 'REMUNERACAO_BRUTA_UBS']]
+dfTabelaGastos_UBS = dfTabelaGastos_UBS.copy()
+dfTabelaGastos_UBS['REMUNERACAO_BRUTA_UBS'] = dfTabelaGastos_UBS['REMUNERACAO_BRUTA_UBS'].apply(
+    lambda x: round(x, 2) if not pd.isnull(x) else 0)
+dfTabelaGastos_UBS = dfTabelaGastos_UBS.rename(columns={'ds_nome': 'Nome', 'REMUNERACAO_BRUTA_UBS': 'Gastos'},
+                                               inplace=False)
+
 # dfTabelaGastos_2019 = dfDadosDistritos[['ds_nome', 'gastos_2019']]
 # dfTabelaGastos_2019 = dfTabelaGastos_2019.copy()
 # dfTabelaGastos_2019['gastos_2019'] = dfTabelaGastos_2019['gastos_2019'].apply(
@@ -499,7 +506,7 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
 
                     geodf['text'] = geodf["text"].str.replace('*', ',')
 
-                    min_percapita = geodf['VALOR_TOTAL_ANUAL'].min()
+                    min_gastoAbsol = geodf['VALOR_TOTAL_ANUAL'].min()
                     fig = go.Figure(data=go.Choropleth(
                         geojson=json.loads(geodf.geometry.to_json()),
                         locations=geodf.index,
@@ -509,7 +516,7 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                         text=geodf['text'],  # hover text
                         hoverinfo='text',
                         colorbar_title="Gasto Absoluto 2020",
-                        zmin=min_percapita,
+                        zmin=min_gastoAbsol,
                         zmax=geodf['VALOR_TOTAL_ANUAL'].max(),
                     ))
                     fig.update_geos(fitbounds="locations", visible=False,
@@ -521,6 +528,47 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                                       plot_bgcolor=colors['chart_background'],
                                       paper_bgcolor=colors['chart_background']
                                       )
+
+                else:
+                    if tipografico == "ubs":
+                        geodf = dfDadosDistritos
+                        geodf['REMUNERACAO_BRUTA_UBS'] = geodf['REMUNERACAO_BRUTA_UBS'].apply(
+                            lambda x: round(x, 2) if not pd.isnull(x) else 0)
+
+                        geodf['geometry'] = geodf['geometry'].to_crs(epsg=4669)
+                        geodf['text'] = geodf['ds_nome'] + ':<br>Gasto: ' \
+                                        + geodf['REMUNERACAO_BRUTA_UBS'].apply(
+                            lambda x: '{:,.2f}'.format(
+                                float(str(round(x, 2)))) if not pd.isna(x) or x != 0 else 'Não se aplica')
+
+                        geodf['text'] = geodf["text"].str.replace('.', '*')
+
+                        geodf['text'] = geodf["text"].str.replace(',', '.')
+
+                        geodf['text'] = geodf["text"].str.replace('*', ',')
+
+                        min_gastoUBS = geodf['REMUNERACAO_BRUTA_UBS'].min()
+                        fig = go.Figure(data=go.Choropleth(
+                            geojson=json.loads(geodf.geometry.to_json()),
+                            locations=geodf.index,
+                            z=geodf['REMUNERACAO_BRUTA_UBS'],
+                            colorscale='Reds',
+                            autocolorscale=False,
+                            text=geodf['text'],  # hover text
+                            hoverinfo='text',
+                            colorbar_title="Gastos",
+                            zmin=min_gastoUBS,
+                            zmax=geodf['REMUNERACAO_BRUTA_UBS'].max(),
+                        ))
+                        fig.update_geos(fitbounds="locations", visible=False,
+                                        bgcolor=colors['chart_background'], scope="south america")
+                        fig.update_layout(margin=dict(l=0, r=0, t=50, b=0),
+                                          showlegend=False,
+                                          height=513,
+                                          title="Gastos com pessoal de UBS da rede direta",
+                                          plot_bgcolor=colors['chart_background'],
+                                          paper_bgcolor=colors['chart_background']
+                                          )
 
         #################################################
 
@@ -651,8 +699,7 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                             dbc.Collapse(
                                 dcc.Dropdown(
                                     id='dpSaude',
-                                    options=[{'label': 'Em desenvolvimento', 'value': 'saude1'},
-                                             {'label': 'Gasto com UBS', 'value': 'ubs'},
+                                    options=[{'label': 'Gastos com pessoal de UBS da rede direta', 'value': 'ubs'},
                                              ],
                                     placeholder='Escolha um indicador',
                                     style={'backgroundColor': colors['background']}),
@@ -812,6 +859,41 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                     ])
                 ], color="dark", outline=True),
                 id="collapseTabelaGastosAbsoluto", is_open=False),
+
+            dbc.Collapse(
+                dbc.Card(style={'backgroundColor': colors['background'], 'color': colors['topic_text']}, children=[
+                    dbc.CardBody([
+                        html.H6("Gasto por Distrito", className="card-title"),
+                        html.Div(style={'backgroundColor': colors['background'], 'color': colors['text']},
+                                 id="divTabelaGastosUBS", children=[
+                                dash_table.DataTable(id="tabelagastosUBS",
+                                                     data=dfTabelaGastos_UBS.to_dict('records'),
+                                                     sort_action='native',
+                                                     style_table={'height': '350px', 'overflowY': 'auto'},
+                                                     style_header={'fontSize': 13, 'font-family': 'arial',
+                                                                   'fontWeight': 'bold'},
+                                                     style_cell={'backgroundColor': colors['table_cell'],
+                                                                 'color': colors['table_text'],
+                                                                 'textAlign': 'left',
+                                                                 'width': '85px',
+                                                                 'whiteSpace': 'normal', 'fontSize': 13,
+                                                                 'font-family': 'arial'},
+                                                     columns=[
+                                                         {'id': c, 'name': c, 'type': 'numeric', 'format': Format(
+                                                             scheme=Scheme.fixed,
+                                                             precision=2,
+                                                             group=Group.yes,
+                                                             groups=3,
+                                                             group_delimiter=".",
+                                                             decimal_delimiter=",",
+                                                         )}
+                                                         for c in dfTabelaGastos_UBS.columns])
+
+                            ]),
+
+                    ])
+                ], color="dark", outline=True),
+                id="collapseTabelaGastosUBS", is_open=False),
 
             dbc.Collapse(
 
@@ -1028,14 +1110,17 @@ def displayClick(btn1, btn2, btn3): # btn4
               Output("collapseTabelaGastosPerCapita", "is_open"),
               Output("collapseTabelaGastosAbsoluto", "is_open"),
               Output("collapseTabelaEja", "is_open"),
+              Output("collapseTabelaGastosUBS", "is_open"),
               Input("dpEducacao", "value"),
+              Input("dpSaude", "value"),
               # Input("dpRegionalizacao", "value"),
               Input("optdados", "value"),
               Input("optanos", "value"),
               Input("optuniversalizacao", "value"),
               Input("sliderEja", "value")
               )
-def displayMapa(indicadores_educacao, dados, anos, anos_universalizacao, sliderEja): # indicadores_regionalizacao
+
+def displayMapa(indicadores_educacao, indicadores_saude, dados, anos, anos_universalizacao, sliderEja):  # indicadores_regionalizacao
     """Exibe os mapas e/ou gráficos gerados de acordo com os botões clicados, retornando
     as figuras de acordo.
 
@@ -1054,6 +1139,7 @@ def displayMapa(indicadores_educacao, dados, anos, anos_universalizacao, sliderE
     collapseTabelaGastosPerCapita = False
     collapseTabelaGastosAbsoluto = False
     collapseTabelaEja = False
+    collapseTabelaGastosUBS = False
     card_Apresentacao_Direita = True
     fig = go.Figure()
     fig2 = go.Figure()
@@ -1435,6 +1521,21 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                     collapseTabelaGastosAbsoluto = True
 
     # else:
+    #     if indicadores_saude is not None:
+    #         if indicadores_saude == 'ubs':
+    #             fig = gerar_mapa("ubs", anos, "", 0)
+    #
+    #             divEsquerdaSup = {"display": "block"}
+    #             divEsquerdaInf = {"display": "block"}
+    #             divGrafDireita = {"display": "block"}
+    #             divInfo = {"display": "block"}
+    #             info = info_idep
+    #             info_header = "Indicador - Saúde"
+    #             collapseGraficosDireita = True
+    #             card_Apresentacao_Direita = False
+    #             collapseTabelaGastosUBS = True
+
+    # else:
     #     if indicadores_regionalizacao is not None:
     #         pass
 
@@ -1444,13 +1545,13 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                 divEsquerdaInf2, divGrafDireita, info, divInfo, divSlider, info_header, collapseGraficosEsquerda,
                 collapseGraficosDireita, card_Apresentacao_Direita, collapseTabelaDistrito,
                 collapseTabelaSubprefeitura, collapseTabelaGastosPerCapita, collapseTabelaGastosAbsoluto,
-                collapseTabelaEja)
+                collapseTabelaEja, collapseTabelaGastosUBS)
 
     return (fig, fig2, fig3, fig4, collapsedivdanos, colapseddivistritossubpreituras, card_universalizacao,
             divEsquerdaSup, divEsquerdaInf, divEsquerdaInf2, divGrafDireita, info, divInfo, divSlider, info_header,
             collapseGraficosEsquerda, collapseGraficosDireita, card_Apresentacao_Direita, collapseTabelaDistrito,
             collapseTabelaSubprefeitura, collapseTabelaGastosPerCapita, collapseTabelaGastosAbsoluto,
-            collapseTabelaEja)
+            collapseTabelaEja, collapseTabelaGastosUBS)
 
 
 def toggle_modal(n1, n2, is_open):

@@ -45,7 +45,7 @@ def distritos(path_salvo, dfIdebIniciais, dfIdebFinais):
         dfU = dfU.sort_values('coddist')
 
         dfGastos = dfIdebIniciais[['coddist', 'gastos_2019', 'PER_CAPITA_anual_2020', 'REMUNERACAO_BRUTA',
-                                   'VALOR_TOTAL_ANUAL']]
+                                   'VALOR_TOTAL_ANUAL', 'REMUNERACAO_BRUTA_UBS']]
         dfGastos = dfGastos.copy()
         dfGastos['gastos_2019'] = pd.to_numeric(dfGastos['gastos_2019'], errors='coerce')
         dfGastos['gastos_2019'] = dfGastos['gastos_2019'].apply(
@@ -60,6 +60,9 @@ def distritos(path_salvo, dfIdebIniciais, dfIdebFinais):
         dfGastos['VALOR_TOTAL_ANUAL'] = dfGastos['VALOR_TOTAL_ANUAL'].str.replace(',', '.').astype(float)
         dfGastos['VALOR_TOTAL_ANUAL'] = pd.to_numeric(dfGastos['VALOR_TOTAL_ANUAL'], errors='coerce')
         dfGastos['VALOR_TOTAL_ANUAL'] = dfGastos['VALOR_TOTAL_ANUAL'].apply(
+            lambda x: round(x, 2) if not pd.isnull(x) else 0)
+        dfGastos['REMUNERACAO_BRUTA_UBS'] = pd.to_numeric(dfGastos['REMUNERACAO_BRUTA_UBS'], errors='coerce')
+        dfGastos['REMUNERACAO_BRUTA_UBS'] = dfGastos['REMUNERACAO_BRUTA_UBS'].apply(
             lambda x: round(x, 2) if not pd.isnull(x) else 0)
         # dfGastos = dfGastos.replace(np.nan, 0, regex=True)
         dfGastos = dfGastos.drop_duplicates()
