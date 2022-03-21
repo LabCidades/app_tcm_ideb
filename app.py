@@ -565,7 +565,7 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                         fig.update_layout(margin=dict(l=0, r=0, t=50, b=0),
                                           showlegend=False,
                                           height=513,
-                                          title="Gastos com pessoal de UBS da rede direta",
+                                          title="Remuneração Bruta de UBS",
                                           plot_bgcolor=colors['chart_background'],
                                           paper_bgcolor=colors['chart_background']
                                           )
@@ -699,7 +699,7 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                             dbc.Collapse(
                                 dcc.Dropdown(
                                     id='dpSaude',
-                                    options=[{'label': 'Gastos com pessoal de UBS da rede direta', 'value': 'ubs'},
+                                    options=[{'label': 'Remuneração Bruta de UBS', 'value': 'ubs'},
                                              ],
                                     placeholder='Escolha um indicador',
                                     style={'backgroundColor': colors['background']}),
@@ -1429,8 +1429,10 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                     #               values='Gênero',
                                     #               names='Quantidade',
                                     #               title='Population of European continent')
-                                    fig2 = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent',
-                                                                  insidetextorientation='radial', hole=0.3
+                                    fig2 = go.Figure(data=[go.Pie(labels=labels, values=values,
+                                                                  textinfo='label+percent',
+                                                                  insidetextorientation='radial',
+                                                                  hole=0.3
                                                                   )])
                                     fig2.update_layout(margin=dict(l=0, r=0, t=50, b=0), autosize=True,
                                                        title="Percentual por Gênero",
@@ -1438,7 +1440,8 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                                        paper_bgcolor=colors['chart_background']
                                                        )
                                     colors_fig2 = ['skyblue', 'orange']
-                                    fig2.update_traces(marker=dict(colors=colors_fig2, line=dict(color='#000000', width=2)))
+                                    fig2.update_traces(marker=dict(colors=colors_fig2,
+                                                                   line=dict(color='#000000', width=2)))
 
                                     dfEjaMatriculas = pd.read_csv("data/eja_matriculas2.csv",
                                                                   sep=";",
@@ -1466,7 +1469,8 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                               'Parda', 'Preta', 'Recusou informar']
                                     values = [135, 11565, 87, 7907, 13767, 3906, 4273]
 
-                                    fig3 = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent',
+                                    fig3 = go.Figure(data=[go.Pie(labels=labels, values=values,
+                                                                  textinfo='label+percent',
                                                                   insidetextorientation='radial')])
                                     fig3.update_layout(margin=dict(l=0, r=0, t=50, b=0), autosize=True, showlegend=True,
                                                        title="Percentual por Raça",
@@ -1480,7 +1484,8 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                     labels = ['15-18', '19-25', '26-30', '31-40', '41-50', '51-60', '61-70', '71-94']
                                     values = [6332, 5411, 2679, 6091, 8856, 6994, 3540, 1711]
 
-                                    fig4 = go.Figure(data=[go.Pie(labels=labels, values=values, textinfo='label+percent',
+                                    fig4 = go.Figure(data=[go.Pie(labels=labels, values=values,
+                                                                  textinfo='label+percent',
                                                                   insidetextorientation='auto')])
                                     fig4.update_layout(margin=dict(l=0, r=0, t=50, b=0), autosize=True, showlegend=True,
                                                        title="Percentual por Idade",
@@ -1536,7 +1541,7 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                 card_Apresentacao_Direita = False
                 collapseTabelaGastosUBS = True
 
-    # else:
+    # elif user_click == "dpRegionalizacao":
     #     if indicadores_regionalizacao is not None:
     #         pass
 
