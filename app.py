@@ -565,7 +565,7 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                         fig.update_layout(margin=dict(l=0, r=0, t=50, b=0),
                                           showlegend=False,
                                           height=513,
-                                          title="Remuneração Bruta de UBS",
+                                          title="Gasto com pessoal da rede direta por UBS",
                                           plot_bgcolor=colors['chart_background'],
                                           paper_bgcolor=colors['chart_background']
                                           )
@@ -699,7 +699,7 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                             dbc.Collapse(
                                 dcc.Dropdown(
                                     id='dpSaude',
-                                    options=[{'label': 'Remuneração Bruta de UBS', 'value': 'ubs'},
+                                    options=[{'label': 'Gasto com pessoal da rede direta por UBS', 'value': 'ubs'},
                                              ],
                                     placeholder='Escolha um indicador',
                                     style={'backgroundColor': colors['background']}),
