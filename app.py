@@ -615,11 +615,11 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                                        color="secondary",
                                        n_clicks=0,
                                        style={"margin-left": "5px"}),
-                            # dbc.Button("Regionalização",
-                            #            id='btn-regionalizacao',
-                            #            color="secondary",
-                            #            n_clicks=0,
-                            #            style={"margin-left": "5px"}),
+                            dbc.Button("Orçamento",
+                                       id='btn-orcamento',
+                                       color="secondary",
+                                       n_clicks=0,
+                                       style={"margin-left": "5px"}),
                         ]),
                         #
                         # dbc.Col([
@@ -699,7 +699,7 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                             dbc.Collapse(
                                 dcc.Dropdown(
                                     id='dpSaude',
-                                    options=[{'label': 'Gasto com pessoal na administração direta por UBS', 'value': 'ubs'},
+                                    options=[{'label': 'Em desenvolvimento', 'value': 'saude1'},
                                              ],
                                     placeholder='Escolha um indicador',
                                     style={'backgroundColor': colors['background']}),
@@ -707,21 +707,21 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
 
                             dbc.Collapse(
                                 dcc.Dropdown(
-                                    id='dpUurbanismo',
+                                    id='dpUrbanismo',
                                     options=[{'label': 'Em desenvolvimento', 'value': 'urbanismo1'},
                                              ],
                                     placeholder='Escolha um indicador',
                                     style={'backgroundColor': colors['background']}),
                                 id="colUrbanismo", is_open=False),
 
-                            # dbc.Collapse(
-                            #     dcc.Dropdown(
-                            #         id='dpRegionalizacao',
-                            #         options=[{'label': 'Gastos', 'value': 'gastos'},
-                            #                  ],
-                            #         placeholder='Escolha um indicador',
-                            #         style={'backgroundColor': colors['background']}),
-                            #     id="colRegionalizacao", is_open=False),
+                            dbc.Collapse(
+                                dcc.Dropdown(
+                                    id='dpOrcamento',
+                                    options=[{'label': 'Gasto com pessoal na administração direta por UBS', 'value': 'ubs'},
+                                             ],
+                                    placeholder='Escolha um indicador',
+                                    style={'backgroundColor': colors['background']}),
+                                id="colOrcamento", is_open=False),
 
                         ], md=9),
 
@@ -1050,14 +1050,14 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
     Output('colEducacao', 'is_open'),
     Output('colSaude', 'is_open'),
     Output('colUrbanismo', 'is_open'),
-    # Output('colRegionalizacao', 'is_open'),
+    Output('colOrcamento', 'is_open'),
     [Input('btn-educacao', 'n_clicks'),
      Input('btn-saude', 'n_clicks'),
      Input('btn-urbanismo', 'n_clicks'),
-     # Input('btn-regionalizacao', 'n_clicks')
+     Input('btn-orcamento', 'n_clicks')
      ]
              )
-def displayClick(btn1, btn2, btn3): # btn4
+def displayClick(btn1, btn2, btn3, btn4):
     """Torna os botões da aplicação interativos retornando os dropdowns
     que aparecem ao clicar neles.
 
@@ -1068,7 +1068,7 @@ def displayClick(btn1, btn2, btn3): # btn4
     m_dropdown_educacao = False
     m_dropdown_saude = False
     m_dropdown_urbanismo = False
-    # m_dropdown_regionalizacao = False
+    m_dropdown_orcamento = False
 
     if 'btn-educacao' in changed_id:
         m_dropdown_educacao = True
@@ -1076,12 +1076,12 @@ def displayClick(btn1, btn2, btn3): # btn4
         m_dropdown_saude = True
     elif 'btn-urbanismo' in changed_id:
         m_dropdown_urbanismo = True
-    # elif 'btn-regionalizacao' in changed_id:
-    #     m_dropdown_regionalizacao = True
+    elif 'btn-orcamento' in changed_id:
+        m_dropdown_orcamento = True
     else:
         pass
 
-    return m_dropdown_educacao, m_dropdown_saude, m_dropdown_urbanismo # , m_dropdown_regionalizacao
+    return m_dropdown_educacao, m_dropdown_saude, m_dropdown_urbanismo, m_dropdown_orcamento
 
 
 #####################################################################
@@ -1112,21 +1112,22 @@ def displayClick(btn1, btn2, btn3): # btn4
               Output("collapseTabelaEja", "is_open"),
               Output("collapseTabelaGastosUBS", "is_open"),
               Input("dpEducacao", "value"),
-              Input("dpSaude", "value"),
-              # Input("dpRegionalizacao", "value"),
+              # Input("dpSaude", "value"),
+              # Input("dpUrbanismo", "value"),
+              Input("dpOrcamento", "value"),
               Input("optdados", "value"),
               Input("optanos", "value"),
               Input("optuniversalizacao", "value"),
               Input("sliderEja", "value")
               )
 
-def displayMapa(indicadores_educacao, indicadores_saude, dados, anos, anos_universalizacao, sliderEja):  # indicadores_regionalizacao
+def displayMapa(indicadores_educacao, indicadores_orcamento, dados, anos, anos_universalizacao, sliderEja):
     """Exibe os mapas e/ou gráficos gerados de acordo com os botões clicados, retornando
     as figuras de acordo.
 
     Variable type: String
 
-    Options: 'ideb', 'idep', 'abandono', 'universalizacao', 'gastos1', 'gastos2' ou 'eja'"""
+    Options: 'ideb', 'idep', 'abandono', 'universalizacao', 'gastos1', 'gastos2', 'eja' ou 'ubs'"""
 
     user_click = dash.callback_context.triggered[0]['prop_id'].split('.')[0]
     colapseddivistritossubpreituras = False
@@ -1526,9 +1527,9 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                         card_Apresentacao_Direita = False
                                         collapseTabelaGastosAbsoluto = True
 
-    elif user_click == "dpSaude":
-        if indicadores_saude is not None:
-            if indicadores_saude == 'ubs':
+    elif user_click == "dpOrcamento":
+        if indicadores_orcamento is not None:
+            if indicadores_orcamento == 'ubs':
                 fig = gerar_mapa("ubs", anos, "", 0)
 
                 divEsquerdaSup = {"display": "block"}
@@ -1541,8 +1542,8 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                 card_Apresentacao_Direita = False
                 collapseTabelaGastosUBS = True
 
-    # elif user_click == "dpRegionalizacao":
-    #     if indicadores_regionalizacao is not None:
+    # elif user_click == "dpSaude":
+    #     if indicadores_saude is not None:
     #         pass
 
     else:  # indicadores não escolhidos
