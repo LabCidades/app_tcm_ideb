@@ -104,27 +104,27 @@ dfTabelaSubprefeitura['Finais'] = dfTabelaSubprefeitura['Finais'].apply(
 dfTabelaSubprefeitura['Média'] = dfTabelaSubprefeitura['Média'].apply(
     lambda x: round(x, 2) if not pd.isnull(x) else 0)
 
-dfTabelaGastos_PerCapita = dfDadosDistritos[['ds_nome', 'PER_CAPITA_anual_2020']]
+dfTabelaGastos_PerCapita = dfDadosDistritos[['ds_nome', 'EDU_PER_CAPITA_anual_2020']]
 dfTabelaGastos_PerCapita = dfTabelaGastos_PerCapita.copy()
-dfTabelaGastos_PerCapita['PER_CAPITA_anual_2020'] = dfTabelaGastos_PerCapita['PER_CAPITA_anual_2020'].apply(
+dfTabelaGastos_PerCapita['EDU_PER_CAPITA_anual_2020'] = dfTabelaGastos_PerCapita['EDU_PER_CAPITA_anual_2020'].apply(
     lambda x: round(x, 2) if not pd.isnull(x) else 0)
 dfTabelaGastos_PerCapita = dfTabelaGastos_PerCapita.rename(columns=
-                                                           {'ds_nome': 'Nome', 'PER_CAPITA_anual_2020': 'Gastos'},
+                                                           {'ds_nome': 'Nome', 'EDU_PER_CAPITA_anual_2020': 'Gastos'},
                                                            inplace=False)
 
-dfTabelaGastos_Absoluto = dfDadosDistritos[['ds_nome', 'VALOR_TOTAL_ANUAL']]
+dfTabelaGastos_Absoluto = dfDadosDistritos[['ds_nome', 'EDU_VALOR_TOTAL_ANUAL_2020']]
 dfTabelaGastos_Absoluto = dfTabelaGastos_Absoluto.copy()
-dfTabelaGastos_Absoluto['VALOR_TOTAL_ANUAL'] = dfTabelaGastos_Absoluto['VALOR_TOTAL_ANUAL'].apply(
+dfTabelaGastos_Absoluto['EDU_VALOR_TOTAL_ANUAL_2020'] = dfTabelaGastos_Absoluto['EDU_VALOR_TOTAL_ANUAL_2020'].apply(
     lambda x: round(x, 2) if not pd.isnull(x) else 0)
 dfTabelaGastos_Absoluto = dfTabelaGastos_Absoluto.rename(columns=
-                                                         {'ds_nome': 'Nome', 'VALOR_TOTAL_ANUAL': 'Gastos'},
+                                                         {'ds_nome': 'Nome', 'EDU_VALOR_TOTAL_ANUAL_2020': 'Gastos'},
                                                          inplace=False)
 
-dfTabelaGastos_UBS = dfDadosDistritos[['ds_nome', 'REMUNERACAO_BRUTA_UBS']]
+dfTabelaGastos_UBS = dfDadosDistritos[['ds_nome', 'ORC_REMUNERACAO_BRUTA_UBS_2020']]
 dfTabelaGastos_UBS = dfTabelaGastos_UBS.copy()
-dfTabelaGastos_UBS['REMUNERACAO_BRUTA_UBS'] = dfTabelaGastos_UBS['REMUNERACAO_BRUTA_UBS'].apply(
+dfTabelaGastos_UBS['ORC_REMUNERACAO_BRUTA_UBS_2020'] = dfTabelaGastos_UBS['ORC_REMUNERACAO_BRUTA_UBS_2020'].apply(
     lambda x: round(x, 2) if not pd.isnull(x) else 0)
-dfTabelaGastos_UBS = dfTabelaGastos_UBS.rename(columns={'ds_nome': 'Nome', 'REMUNERACAO_BRUTA_UBS': 'Gastos'},
+dfTabelaGastos_UBS = dfTabelaGastos_UBS.rename(columns={'ds_nome': 'Nome', 'ORC_REMUNERACAO_BRUTA_UBS_2020': 'Gastos'},
                                                inplace=False)
 
 # dfTabelaGastos_2019 = dfDadosDistritos[['ds_nome', 'gastos_2019']]
@@ -450,12 +450,12 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
         else:
             if tipografico == "gastos1":
                 geodf = dfDadosDistritos
-                geodf['PER_CAPITA_anual_2020'] = geodf['PER_CAPITA_anual_2020'].apply(
+                geodf['EDU_PER_CAPITA_anual_2020'] = geodf['EDU_PER_CAPITA_anual_2020'].apply(
                     lambda x: round(x, 2) if not pd.isnull(x) else 0)
 
                 geodf['geometry'] = geodf['geometry'].to_crs(epsg=4669)
                 geodf['text'] = geodf['ds_nome'] + ':<br>Gasto: ' \
-                    + geodf['PER_CAPITA_anual_2020'].apply(
+                    + geodf['EDU_PER_CAPITA_anual_2020'].apply(
                     lambda x: '{:,.2f}'.format(
                         float(str(round(x, 2)))) if not pd.isna(x) or x != 0 else 'Não se aplica')
 
@@ -465,18 +465,18 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
 
                 geodf['text'] = geodf["text"].str.replace('*', ',')
 
-                min_percapita = geodf['PER_CAPITA_anual_2020'].min()
+                min_percapita = geodf['EDU_PER_CAPITA_anual_2020'].min()
                 fig = go.Figure(data=go.Choropleth(
                     geojson=json.loads(geodf.geometry.to_json()),
                     locations=geodf.index,
-                    z=geodf['PER_CAPITA_anual_2020'],
+                    z=geodf['EDU_PER_CAPITA_anual_2020'],
                     colorscale='Reds',
                     autocolorscale=False,
                     text=geodf['text'],  # hover text
                     hoverinfo='text',
                     colorbar_title="Gastos Per Capita 2020",
                     zmin=min_percapita,
-                    zmax=geodf['PER_CAPITA_anual_2020'].max(),
+                    zmax=geodf['EDU_PER_CAPITA_anual_2020'].max(),
                 ))
                 fig.update_geos(fitbounds="locations", visible=False,
                                 bgcolor=colors['chart_background'], scope="south america")
@@ -491,12 +491,12 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
             else:
                 if tipografico == "gastos2":
                     geodf = dfDadosDistritos
-                    geodf['VALOR_TOTAL_ANUAL'] = geodf['VALOR_TOTAL_ANUAL'].apply(
+                    geodf['EDU_VALOR_TOTAL_ANUAL_2020'] = geodf['EDU_VALOR_TOTAL_ANUAL_2020'].apply(
                         lambda x: round(x, 2) if not pd.isnull(x) else 0)
 
                     geodf['geometry'] = geodf['geometry'].to_crs(epsg=4669)
                     geodf['text'] = geodf['ds_nome'] + ':<br>Gasto: ' \
-                                    + geodf['VALOR_TOTAL_ANUAL'].apply(
+                                    + geodf['EDU_VALOR_TOTAL_ANUAL_2020'].apply(
                         lambda x: '{:,.2f}'.format(
                             float(str(round(x, 2)))) if not pd.isna(x) or x != 0 else 'Não se aplica')
 
@@ -506,18 +506,18 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
 
                     geodf['text'] = geodf["text"].str.replace('*', ',')
 
-                    min_gastoAbsol = geodf['VALOR_TOTAL_ANUAL'].min()
+                    min_gastoAbsol = geodf['EDU_VALOR_TOTAL_ANUAL_2020'].min()
                     fig = go.Figure(data=go.Choropleth(
                         geojson=json.loads(geodf.geometry.to_json()),
                         locations=geodf.index,
-                        z=geodf['VALOR_TOTAL_ANUAL'],
+                        z=geodf['EDU_VALOR_TOTAL_ANUAL_2020'],
                         colorscale='Reds',
                         autocolorscale=False,
                         text=geodf['text'],  # hover text
                         hoverinfo='text',
                         colorbar_title="Gasto Absoluto 2020",
                         zmin=min_gastoAbsol,
-                        zmax=geodf['VALOR_TOTAL_ANUAL'].max(),
+                        zmax=geodf['EDU_VALOR_TOTAL_ANUAL_2020'].max(),
                     ))
                     fig.update_geos(fitbounds="locations", visible=False,
                                     bgcolor=colors['chart_background'], scope="south america")
@@ -532,12 +532,12 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                 else:
                     if tipografico == "ubs":
                         geodf = dfDadosDistritos
-                        geodf['REMUNERACAO_BRUTA_UBS'] = geodf['REMUNERACAO_BRUTA_UBS'].apply(
+                        geodf['ORC_REMUNERACAO_BRUTA_UBS_2020'] = geodf['ORC_REMUNERACAO_BRUTA_UBS_2020'].apply(
                             lambda x: round(x, 2) if not pd.isnull(x) else 0)
 
                         geodf['geometry'] = geodf['geometry'].to_crs(epsg=4669)
                         geodf['text'] = geodf['ds_nome'] + ':<br>Gasto: ' \
-                                        + geodf['REMUNERACAO_BRUTA_UBS'].apply(
+                                        + geodf['ORC_REMUNERACAO_BRUTA_UBS_2020'].apply(
                             lambda x: '{:,.2f}'.format(
                                 float(str(round(x, 2)))) if not pd.isna(x) or x != 0 else 'Não se aplica')
 
@@ -547,25 +547,25 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
 
                         geodf['text'] = geodf["text"].str.replace('*', ',')
 
-                        min_gastoUBS = geodf['REMUNERACAO_BRUTA_UBS'].min()
+                        min_gastoUBS = geodf['ORC_REMUNERACAO_BRUTA_UBS_2020'].min()
                         fig = go.Figure(data=go.Choropleth(
                             geojson=json.loads(geodf.geometry.to_json()),
                             locations=geodf.index,
-                            z=geodf['REMUNERACAO_BRUTA_UBS'],
+                            z=geodf['ORC_REMUNERACAO_BRUTA_UBS_2020'],
                             colorscale='Reds',
                             autocolorscale=False,
                             text=geodf['text'],  # hover text
                             hoverinfo='text',
                             colorbar_title="Gastos",
                             zmin=min_gastoUBS,
-                            zmax=geodf['REMUNERACAO_BRUTA_UBS'].max(),
+                            zmax=geodf['ORC_REMUNERACAO_BRUTA_UBS_2020'].max(),
                         ))
                         fig.update_geos(fitbounds="locations", visible=False,
                                         bgcolor=colors['chart_background'], scope="south america")
                         fig.update_layout(margin=dict(l=0, r=0, t=50, b=0),
                                           showlegend=False,
                                           height=513,
-                                          title="Gasto com pessoal na administração direta por UBS",
+                                          title="Gasto com pessoal na administração direta por UBS de 2020",
                                           plot_bgcolor=colors['chart_background'],
                                           paper_bgcolor=colors['chart_background']
                                           )
@@ -583,7 +583,7 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY], suppress_cal
 
 server = app.server
 
-app.title = 'Regionalização IDEB 2019'
+app.title = 'Observatório de Políticas Públicas - TCMSP'
 
 
 loading_style = {'position': 'absolute', 'align-self': 'center'}
@@ -685,13 +685,13 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                             dbc.Collapse(
                                 dcc.Dropdown(
                                     id='dpEducacao',
-                                    options=[{'label': 'Ideb', 'value': 'ideb'},
-                                             {'label': 'Idep', 'value': 'idep'},
-                                             {'label': 'EJA', 'value': 'eja'},
-                                             {'label': 'Gastos Per Capita', 'value': 'gastos1'},
-                                             {'label': 'Gasto Absoluto', 'value': 'gastos2'},
-                                             {'label': 'Taxa de Abandono', 'value': 'abandono'},
-                                             {'label': 'Universalização', 'value': 'universalizacao'}],
+                                    options=[{'label': 'Ideb (2019)', 'value': 'ideb'},
+                                             {'label': 'Idep (2019)', 'value': 'idep'},
+                                             {'label': 'EJA (2006-2020)', 'value': 'eja'},
+                                             {'label': 'Gastos Per Capita (2020)', 'value': 'gastos1'},
+                                             {'label': 'Gasto Absoluto (2020)', 'value': 'gastos2'},
+                                             {'label': 'Taxa de Abandono (2012-2020)', 'value': 'abandono'},
+                                             {'label': 'Universalização (2010-2020)', 'value': 'universalizacao'}],
                                     placeholder='Escolha um indicador',
                                     style={'backgroundColor': colors['background']}),
                                 id="colEducacao", is_open=False),
@@ -717,7 +717,7 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                             dbc.Collapse(
                                 dcc.Dropdown(
                                     id='dpOrcamento',
-                                    options=[{'label': 'Gasto com pessoal na administração direta por UBS', 'value': 'ubs'},
+                                    options=[{'label': 'Gasto com pessoal na administração direta por UBS (2020)', 'value': 'ubs'},
                                              ],
                                     placeholder='Escolha um indicador',
                                     style={'backgroundColor': colors['background']}),
@@ -1398,7 +1398,7 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                             collapseGraficosEsquerda = True
                             collapseGraficosDireita = True
                             card_Apresentacao_Direita = False
-                            card_universalizacao = True
+                            card_universalizacao = False
 
                         else:
 
