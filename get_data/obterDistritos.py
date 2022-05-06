@@ -45,7 +45,8 @@ def distritos(path_salvo, dfIdebIniciais, dfIdebFinais):
         dfU = dfU.sort_values('coddist')
 
         dfGastos = dfIdebIniciais[['coddist', 'gastos_2019', 'EDU_PER_CAPITA_anual_2020', 'REMUNERACAO_BRUTA',
-                                   'EDU_VALOR_TOTAL_ANUAL_2020', 'ORC_REMUNERACAO_BRUTA_UBS_2020']]
+                                   'EDU_VALOR_TOTAL_ANUAL_2020', 'ORC_REMUNERACAO_BRUTA_UBS_2020',
+                                   'SAU_PORCENTAGEM_HORAS_CUMPRIDAS_DIST_2020']]
         dfGastos = dfGastos.copy()
         dfGastos['gastos_2019'] = pd.to_numeric(dfGastos['gastos_2019'], errors='coerce')
         dfGastos['gastos_2019'] = dfGastos['gastos_2019'].apply(
@@ -61,9 +62,16 @@ def distritos(path_salvo, dfIdebIniciais, dfIdebFinais):
         dfGastos['EDU_VALOR_TOTAL_ANUAL_2020'] = pd.to_numeric(dfGastos['EDU_VALOR_TOTAL_ANUAL_2020'], errors='coerce')
         dfGastos['EDU_VALOR_TOTAL_ANUAL_2020'] = dfGastos['EDU_VALOR_TOTAL_ANUAL_2020'].apply(
             lambda x: round(x, 2) if not pd.isnull(x) else 0)
-        dfGastos['ORC_REMUNERACAO_BRUTA_UBS_2020'] = pd.to_numeric(dfGastos['ORC_REMUNERACAO_BRUTA_UBS_2020'], errors='coerce')
+        dfGastos['ORC_REMUNERACAO_BRUTA_UBS_2020'] = pd.to_numeric(dfGastos['ORC_REMUNERACAO_BRUTA_UBS_2020'],
+                                                                   errors='coerce')
         dfGastos['ORC_REMUNERACAO_BRUTA_UBS_2020'] = dfGastos['ORC_REMUNERACAO_BRUTA_UBS_2020'].apply(
             lambda x: round(x, 2) if not pd.isnull(x) else 0)
+
+        dfGastos['SAU_PORCENTAGEM_HORAS_CUMPRIDAS_DIST_2020'] = pd.to_numeric(dfGastos['SAU_PORCENTAGEM_HORAS_CUMPRIDAS_DIST_2020'],
+                                                                              errors='coerce')
+        dfGastos['SAU_PORCENTAGEM_HORAS_CUMPRIDAS_DIST_2020'] = dfGastos['SAU_PORCENTAGEM_HORAS_CUMPRIDAS_DIST_2020'].apply(
+            lambda x: round(x, 4))
+
         # dfGastos = dfGastos.replace(np.nan, 0, regex=True)
         dfGastos = dfGastos.drop_duplicates()
         dfGastos = dfGastos.sort_values('coddist')
