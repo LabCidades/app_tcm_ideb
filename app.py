@@ -104,28 +104,41 @@ dfTabelaSubprefeitura['Finais'] = dfTabelaSubprefeitura['Finais'].apply(
 dfTabelaSubprefeitura['Média'] = dfTabelaSubprefeitura['Média'].apply(
     lambda x: round(x, 2) if not pd.isnull(x) else 0)
 
-dfTabelaGastos_PerCapita = dfDadosDistritos[['ds_nome', 'PER_CAPITA_anual_2020']]
+dfTabelaGastos_PerCapita = dfDadosDistritos[['ds_nome', 'EDU_PER_CAPITA_anual_2020']]
 dfTabelaGastos_PerCapita = dfTabelaGastos_PerCapita.copy()
-dfTabelaGastos_PerCapita['PER_CAPITA_anual_2020'] = dfTabelaGastos_PerCapita['PER_CAPITA_anual_2020'].apply(
+dfTabelaGastos_PerCapita['EDU_PER_CAPITA_anual_2020'] = dfTabelaGastos_PerCapita['EDU_PER_CAPITA_anual_2020'].apply(
     lambda x: round(x, 2) if not pd.isnull(x) else 0)
 dfTabelaGastos_PerCapita = dfTabelaGastos_PerCapita.rename(columns=
-                                                           {'ds_nome': 'Nome', 'PER_CAPITA_anual_2020': 'Gastos'},
+                                                           {'ds_nome': 'Nome', 'EDU_PER_CAPITA_anual_2020': 'Gastos'},
                                                            inplace=False)
 
-dfTabelaGastos_Absoluto = dfDadosDistritos[['ds_nome', 'VALOR_TOTAL_ANUAL']]
+dfTabelaGastos_Absoluto = dfDadosDistritos[['ds_nome', 'EDU_VALOR_TOTAL_ANUAL_2020']]
 dfTabelaGastos_Absoluto = dfTabelaGastos_Absoluto.copy()
-dfTabelaGastos_Absoluto['VALOR_TOTAL_ANUAL'] = dfTabelaGastos_Absoluto['VALOR_TOTAL_ANUAL'].apply(
+dfTabelaGastos_Absoluto['EDU_VALOR_TOTAL_ANUAL_2020'] = dfTabelaGastos_Absoluto['EDU_VALOR_TOTAL_ANUAL_2020'].apply(
     lambda x: round(x, 2) if not pd.isnull(x) else 0)
 dfTabelaGastos_Absoluto = dfTabelaGastos_Absoluto.rename(columns=
-                                                         {'ds_nome': 'Nome', 'VALOR_TOTAL_ANUAL': 'Gastos'},
+                                                         {'ds_nome': 'Nome', 'EDU_VALOR_TOTAL_ANUAL_2020': 'Gastos'},
                                                          inplace=False)
 
-dfTabelaGastos_UBS = dfDadosDistritos[['ds_nome', 'REMUNERACAO_BRUTA_UBS']]
+dfTabelaGastos_UBS = dfDadosDistritos[['ds_nome', 'ORC_REMUNERACAO_BRUTA_UBS_2020']]
 dfTabelaGastos_UBS = dfTabelaGastos_UBS.copy()
-dfTabelaGastos_UBS['REMUNERACAO_BRUTA_UBS'] = dfTabelaGastos_UBS['REMUNERACAO_BRUTA_UBS'].apply(
+dfTabelaGastos_UBS['ORC_REMUNERACAO_BRUTA_UBS_2020'] = dfTabelaGastos_UBS['ORC_REMUNERACAO_BRUTA_UBS_2020'].apply(
     lambda x: round(x, 2) if not pd.isnull(x) else 0)
-dfTabelaGastos_UBS = dfTabelaGastos_UBS.rename(columns={'ds_nome': 'Nome', 'REMUNERACAO_BRUTA_UBS': 'Gastos'},
+dfTabelaGastos_UBS = dfTabelaGastos_UBS.rename(columns={'ds_nome': 'Nome', 'ORC_REMUNERACAO_BRUTA_UBS_2020': 'Gastos'},
                                                inplace=False)
+
+dfTabelaEquipeMinima = pd.read_excel('data/equipe_minima_agrup_por_unidade.xlsx')
+dfTabelaEquipeMinima = dfTabelaEquipeMinima[['DISTRITOS', 'DESCRICAO_UNIDADE', 'CONTRATADA_UNID', 'APONTADA_UNID',
+                                             'PORCENTAGEM_UNIDADE_CENT']]
+dfTabelaEquipeMinima['PORCENTAGEM_UNIDADE_CENT'] = (dfTabelaEquipeMinima['PORCENTAGEM_UNIDADE_CENT']*100).apply(
+    lambda x: '{:,.2f}'.format(
+        float(str(round(x, 2)))) if not pd.isna(x) or x != 0 else 'Não se aplica') + "%"
+dfTabelaEquipeMinima = dfTabelaEquipeMinima.rename(columns={'DISTRITOS': 'Distrito',
+                                                            'DESCRICAO_UNIDADE': 'Unidade',
+                                                            'CONTRATADA_UNID': 'Horas contratadas',
+                                                            'APONTADA_UNID': 'Horas apontadas',
+                                                            'PORCENTAGEM_UNIDADE_CENT': 'Taxa cumprida'},
+                                                   inplace=False)
 
 # dfTabelaGastos_2019 = dfDadosDistritos[['ds_nome', 'gastos_2019']]
 # dfTabelaGastos_2019 = dfTabelaGastos_2019.copy()
@@ -316,7 +329,7 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                         tipodados: String;
                         anos_universalizacao: int}
 
-    Options:{tipografico: 'ideb', 'univerzalizacao', 'gastos1' ou 'gastos2'
+    Options:{tipografico: 'ideb', 'univerzalizacao', 'gastos1', 'gastos2', ou "equipe"
                 tipodados: 'distritos' ou 'subprefeituras'
                 anos_universalizacao: 2019}"""
 
@@ -450,12 +463,12 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
         else:
             if tipografico == "gastos1":
                 geodf = dfDadosDistritos
-                geodf['PER_CAPITA_anual_2020'] = geodf['PER_CAPITA_anual_2020'].apply(
+                geodf['EDU_PER_CAPITA_anual_2020'] = geodf['EDU_PER_CAPITA_anual_2020'].apply(
                     lambda x: round(x, 2) if not pd.isnull(x) else 0)
 
                 geodf['geometry'] = geodf['geometry'].to_crs(epsg=4669)
                 geodf['text'] = geodf['ds_nome'] + ':<br>Gasto: ' \
-                    + geodf['PER_CAPITA_anual_2020'].apply(
+                    + geodf['EDU_PER_CAPITA_anual_2020'].apply(
                     lambda x: '{:,.2f}'.format(
                         float(str(round(x, 2)))) if not pd.isna(x) or x != 0 else 'Não se aplica')
 
@@ -465,18 +478,18 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
 
                 geodf['text'] = geodf["text"].str.replace('*', ',')
 
-                min_percapita = geodf['PER_CAPITA_anual_2020'].min()
+                min_percapita = geodf['EDU_PER_CAPITA_anual_2020'].min()
                 fig = go.Figure(data=go.Choropleth(
                     geojson=json.loads(geodf.geometry.to_json()),
                     locations=geodf.index,
-                    z=geodf['PER_CAPITA_anual_2020'],
+                    z=geodf['EDU_PER_CAPITA_anual_2020'],
                     colorscale='Reds',
                     autocolorscale=False,
                     text=geodf['text'],  # hover text
                     hoverinfo='text',
                     colorbar_title="Gastos Per Capita 2020",
                     zmin=min_percapita,
-                    zmax=geodf['PER_CAPITA_anual_2020'].max(),
+                    zmax=geodf['EDU_PER_CAPITA_anual_2020'].max(),
                 ))
                 fig.update_geos(fitbounds="locations", visible=False,
                                 bgcolor=colors['chart_background'], scope="south america")
@@ -491,12 +504,12 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
             else:
                 if tipografico == "gastos2":
                     geodf = dfDadosDistritos
-                    geodf['VALOR_TOTAL_ANUAL'] = geodf['VALOR_TOTAL_ANUAL'].apply(
+                    geodf['EDU_VALOR_TOTAL_ANUAL_2020'] = geodf['EDU_VALOR_TOTAL_ANUAL_2020'].apply(
                         lambda x: round(x, 2) if not pd.isnull(x) else 0)
 
                     geodf['geometry'] = geodf['geometry'].to_crs(epsg=4669)
                     geodf['text'] = geodf['ds_nome'] + ':<br>Gasto: ' \
-                                    + geodf['VALOR_TOTAL_ANUAL'].apply(
+                                    + geodf['EDU_VALOR_TOTAL_ANUAL_2020'].apply(
                         lambda x: '{:,.2f}'.format(
                             float(str(round(x, 2)))) if not pd.isna(x) or x != 0 else 'Não se aplica')
 
@@ -506,18 +519,18 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
 
                     geodf['text'] = geodf["text"].str.replace('*', ',')
 
-                    min_gastoAbsol = geodf['VALOR_TOTAL_ANUAL'].min()
+                    min_gastoAbsol = geodf['EDU_VALOR_TOTAL_ANUAL_2020'].min()
                     fig = go.Figure(data=go.Choropleth(
                         geojson=json.loads(geodf.geometry.to_json()),
                         locations=geodf.index,
-                        z=geodf['VALOR_TOTAL_ANUAL'],
+                        z=geodf['EDU_VALOR_TOTAL_ANUAL_2020'],
                         colorscale='Reds',
                         autocolorscale=False,
                         text=geodf['text'],  # hover text
                         hoverinfo='text',
                         colorbar_title="Gasto Absoluto 2020",
                         zmin=min_gastoAbsol,
-                        zmax=geodf['VALOR_TOTAL_ANUAL'].max(),
+                        zmax=geodf['EDU_VALOR_TOTAL_ANUAL_2020'].max(),
                     ))
                     fig.update_geos(fitbounds="locations", visible=False,
                                     bgcolor=colors['chart_background'], scope="south america")
@@ -532,12 +545,12 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                 else:
                     if tipografico == "ubs":
                         geodf = dfDadosDistritos
-                        geodf['REMUNERACAO_BRUTA_UBS'] = geodf['REMUNERACAO_BRUTA_UBS'].apply(
+                        geodf['ORC_REMUNERACAO_BRUTA_UBS_2020'] = geodf['ORC_REMUNERACAO_BRUTA_UBS_2020'].apply(
                             lambda x: round(x, 2) if not pd.isnull(x) else 0)
 
                         geodf['geometry'] = geodf['geometry'].to_crs(epsg=4669)
                         geodf['text'] = geodf['ds_nome'] + ':<br>Gasto: ' \
-                                        + geodf['REMUNERACAO_BRUTA_UBS'].apply(
+                                        + geodf['ORC_REMUNERACAO_BRUTA_UBS_2020'].apply(
                             lambda x: '{:,.2f}'.format(
                                 float(str(round(x, 2)))) if not pd.isna(x) or x != 0 else 'Não se aplica')
 
@@ -547,28 +560,69 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
 
                         geodf['text'] = geodf["text"].str.replace('*', ',')
 
-                        min_gastoUBS = geodf['REMUNERACAO_BRUTA_UBS'].min()
+                        min_gastoUBS = geodf['ORC_REMUNERACAO_BRUTA_UBS_2020'].min()
                         fig = go.Figure(data=go.Choropleth(
                             geojson=json.loads(geodf.geometry.to_json()),
                             locations=geodf.index,
-                            z=geodf['REMUNERACAO_BRUTA_UBS'],
+                            z=geodf['ORC_REMUNERACAO_BRUTA_UBS_2020'],
                             colorscale='Reds',
                             autocolorscale=False,
                             text=geodf['text'],  # hover text
                             hoverinfo='text',
                             colorbar_title="Gastos",
                             zmin=min_gastoUBS,
-                            zmax=geodf['REMUNERACAO_BRUTA_UBS'].max(),
+                            zmax=geodf['ORC_REMUNERACAO_BRUTA_UBS_2020'].max(),
                         ))
                         fig.update_geos(fitbounds="locations", visible=False,
                                         bgcolor=colors['chart_background'], scope="south america")
                         fig.update_layout(margin=dict(l=0, r=0, t=50, b=0),
                                           showlegend=False,
                                           height=513,
-                                          title="Gasto com pessoal na administração direta por UBS",
+                                          title="Gasto com pessoal na administração direta por UBS de 2020",
                                           plot_bgcolor=colors['chart_background'],
                                           paper_bgcolor=colors['chart_background']
                                           )
+
+                    else:
+                        if tipografico == "equipe":
+                            geodf = dfDadosDistritos
+                            geodf['SAU_PORCENTAGEM_HORAS_CUMPRIDAS_DIST_2020'] = geodf['SAU_PORCENTAGEM_HORAS_CUMPRIDAS_DIST_2020'].apply(
+                                lambda x: round(x, 4) if not pd.isnull(x) else 0)
+
+                            geodf['geometry'] = geodf['geometry'].to_crs(epsg=4669)
+                            geodf['text'] = geodf['ds_nome'] + ':<br>Porcentagem cumprida: ' \
+                                            + (geodf['SAU_PORCENTAGEM_HORAS_CUMPRIDAS_DIST_2020']*100).apply(
+                                lambda x: '{:,.2f}'.format(
+                                    float(str(round(x, 2)))) if not pd.isna(x) or x != 0 else 'Não se aplica') + "%"
+
+                            geodf['text'] = geodf["text"].str.replace('.', '*')
+
+                            geodf['text'] = geodf["text"].str.replace(',', '.')
+
+                            geodf['text'] = geodf["text"].str.replace('*', ',')
+
+                            min_horasCumpridas = geodf['SAU_PORCENTAGEM_HORAS_CUMPRIDAS_DIST_2020'].min()
+                            fig = go.Figure(data=go.Choropleth(
+                                geojson=json.loads(geodf.geometry.to_json()),
+                                locations=geodf.index,
+                                z=geodf['SAU_PORCENTAGEM_HORAS_CUMPRIDAS_DIST_2020'],
+                                colorscale='Reds',
+                                autocolorscale=False,
+                                text=geodf['text'],  # hover text
+                                hoverinfo='text',
+                                colorbar_title="Horas Cumpridas",
+                                zmin=min_horasCumpridas,
+                                zmax=geodf['SAU_PORCENTAGEM_HORAS_CUMPRIDAS_DIST_2020'].max(),
+                            ))
+                            fig.update_geos(fitbounds="locations", visible=False,
+                                            bgcolor=colors['chart_background'], scope="south america")
+                            fig.update_layout(margin=dict(l=0, r=0, t=50, b=0),
+                                              showlegend=False,
+                                              height=513,
+                                              title="Equipe Miníma Contratada 2020",
+                                              plot_bgcolor=colors['chart_background'],
+                                              paper_bgcolor=colors['chart_background']
+                                              )
 
         #################################################
 
@@ -583,7 +637,7 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY], suppress_cal
 
 server = app.server
 
-app.title = 'Regionalização IDEB 2019'
+app.title = 'Observatório de Políticas Públicas - TCMSP'
 
 
 loading_style = {'position': 'absolute', 'align-self': 'center'}
@@ -615,11 +669,11 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                                        color="secondary",
                                        n_clicks=0,
                                        style={"margin-left": "5px"}),
-                            # dbc.Button("Regionalização",
-                            #            id='btn-regionalizacao',
-                            #            color="secondary",
-                            #            n_clicks=0,
-                            #            style={"margin-left": "5px"}),
+                            dbc.Button("Orçamento",
+                                       id='btn-orcamento',
+                                       color="secondary",
+                                       n_clicks=0,
+                                       style={"margin-left": "5px"}),
                         ]),
                         #
                         # dbc.Col([
@@ -685,13 +739,13 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                             dbc.Collapse(
                                 dcc.Dropdown(
                                     id='dpEducacao',
-                                    options=[{'label': 'Ideb', 'value': 'ideb'},
-                                             {'label': 'Idep', 'value': 'idep'},
-                                             {'label': 'EJA', 'value': 'eja'},
-                                             {'label': 'Gastos Per Capita', 'value': 'gastos1'},
-                                             {'label': 'Gasto Absoluto', 'value': 'gastos2'},
-                                             {'label': 'Taxa de Abandono', 'value': 'abandono'},
-                                             {'label': 'Universalização', 'value': 'universalizacao'}],
+                                    options=[{'label': 'Ideb (2019)', 'value': 'ideb'},
+                                             {'label': 'Idep (2019)', 'value': 'idep'},
+                                             {'label': 'EJA (2006-2020)', 'value': 'eja'},
+                                             {'label': 'Gastos Per Capita (2020)', 'value': 'gastos1'},
+                                             {'label': 'Gasto Absoluto (2020)', 'value': 'gastos2'},
+                                             {'label': 'Taxa de Abandono (2012-2020)', 'value': 'abandono'},
+                                             {'label': 'Universalização (2010-2020)', 'value': 'universalizacao'}],
                                     placeholder='Escolha um indicador',
                                     style={'backgroundColor': colors['background']}),
                                 id="colEducacao", is_open=False),
@@ -699,7 +753,7 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                             dbc.Collapse(
                                 dcc.Dropdown(
                                     id='dpSaude',
-                                    options=[{'label': 'Gasto com pessoal na administração direta por UBS', 'value': 'ubs'},
+                                    options=[{'label': 'Equipe Miníma Contratada (2020)', 'value': 'equipe'},
                                              ],
                                     placeholder='Escolha um indicador',
                                     style={'backgroundColor': colors['background']}),
@@ -707,21 +761,21 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
 
                             dbc.Collapse(
                                 dcc.Dropdown(
-                                    id='dpUurbanismo',
+                                    id='dpUrbanismo',
                                     options=[{'label': 'Em desenvolvimento', 'value': 'urbanismo1'},
                                              ],
                                     placeholder='Escolha um indicador',
                                     style={'backgroundColor': colors['background']}),
                                 id="colUrbanismo", is_open=False),
 
-                            # dbc.Collapse(
-                            #     dcc.Dropdown(
-                            #         id='dpRegionalizacao',
-                            #         options=[{'label': 'Gastos', 'value': 'gastos'},
-                            #                  ],
-                            #         placeholder='Escolha um indicador',
-                            #         style={'backgroundColor': colors['background']}),
-                            #     id="colRegionalizacao", is_open=False),
+                            dbc.Collapse(
+                                dcc.Dropdown(
+                                    id='dpOrcamento',
+                                    options=[{'label': 'Gasto com pessoal na administração direta por UBS (2020)', 'value': 'ubs'},
+                                             ],
+                                    placeholder='Escolha um indicador',
+                                    style={'backgroundColor': colors['background']}),
+                                id="colOrcamento", is_open=False),
 
                         ], md=9),
 
@@ -863,6 +917,42 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
             dbc.Collapse(
                 dbc.Card(style={'backgroundColor': colors['background'], 'color': colors['topic_text']}, children=[
                     dbc.CardBody([
+                        html.H6("Equipe Miníma", className="card-title"),
+                        html.Div(style={'backgroundColor': colors['background'], 'color': colors['text']},
+                                 id="divTabelaEquipeMinima", children=[
+                                dash_table.DataTable(id="tabelaEquipeMinima",
+                                                     data=dfTabelaEquipeMinima.to_dict('records'),
+                                                     sort_action='native',
+                                                     style_table={'height': '350px', 'overflowY': 'auto'},
+                                                     style_header={'fontSize': 13, 'font-family': 'arial',
+                                                                   'fontWeight': 'bold'},
+                                                     style_cell={'backgroundColor': colors['table_cell'],
+                                                                 'color': colors['table_text'],
+                                                                 'textAlign': 'left',
+                                                                 'width': '85px',
+                                                                 'whiteSpace': 'normal', 'fontSize': 13,
+                                                                 'font-family': 'arial'},
+                                                     columns=[
+                                                         {'id': c, 'name': c, 'type': 'numeric', 'format': Format(
+                                                             scheme=Scheme.fixed,
+                                                             precision=0,
+                                                             group=Group.yes,
+                                                             groups=3,
+                                                             group_delimiter=".",
+                                                             decimal_delimiter=",",
+                                                         )}
+                                                         for c in dfTabelaEquipeMinima.columns]
+                                                     )
+
+                            ]),
+
+                    ])
+                ], color="dark", outline=True),
+                id="collapseTabelaEquipeMinima", is_open=False),
+
+            dbc.Collapse(
+                dbc.Card(style={'backgroundColor': colors['background'], 'color': colors['topic_text']}, children=[
+                    dbc.CardBody([
                         html.H6("Gasto por Distrito", className="card-title"),
                         html.Div(style={'backgroundColor': colors['background'], 'color': colors['text']},
                                  id="divTabelaGastosUBS", children=[
@@ -924,6 +1014,7 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                     ])
                 ], color="dark", outline=True),
                 id="collapseTabelaSubprefeitura", is_open=False),
+
             dbc.CardHeader(style={'backgroundColor': colors['background']})
 
         ], width=5),
@@ -1050,14 +1141,14 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
     Output('colEducacao', 'is_open'),
     Output('colSaude', 'is_open'),
     Output('colUrbanismo', 'is_open'),
-    # Output('colRegionalizacao', 'is_open'),
+    Output('colOrcamento', 'is_open'),
     [Input('btn-educacao', 'n_clicks'),
      Input('btn-saude', 'n_clicks'),
      Input('btn-urbanismo', 'n_clicks'),
-     # Input('btn-regionalizacao', 'n_clicks')
+     Input('btn-orcamento', 'n_clicks')
      ]
              )
-def displayClick(btn1, btn2, btn3): # btn4
+def displayClick(btn1, btn2, btn3, btn4):
     """Torna os botões da aplicação interativos retornando os dropdowns
     que aparecem ao clicar neles.
 
@@ -1068,7 +1159,7 @@ def displayClick(btn1, btn2, btn3): # btn4
     m_dropdown_educacao = False
     m_dropdown_saude = False
     m_dropdown_urbanismo = False
-    # m_dropdown_regionalizacao = False
+    m_dropdown_orcamento = False
 
     if 'btn-educacao' in changed_id:
         m_dropdown_educacao = True
@@ -1076,12 +1167,12 @@ def displayClick(btn1, btn2, btn3): # btn4
         m_dropdown_saude = True
     elif 'btn-urbanismo' in changed_id:
         m_dropdown_urbanismo = True
-    # elif 'btn-regionalizacao' in changed_id:
-    #     m_dropdown_regionalizacao = True
+    elif 'btn-orcamento' in changed_id:
+        m_dropdown_orcamento = True
     else:
         pass
 
-    return m_dropdown_educacao, m_dropdown_saude, m_dropdown_urbanismo # , m_dropdown_regionalizacao
+    return m_dropdown_educacao, m_dropdown_saude, m_dropdown_urbanismo, m_dropdown_orcamento
 
 
 #####################################################################
@@ -1110,23 +1201,25 @@ def displayClick(btn1, btn2, btn3): # btn4
               Output("collapseTabelaGastosPerCapita", "is_open"),
               Output("collapseTabelaGastosAbsoluto", "is_open"),
               Output("collapseTabelaEja", "is_open"),
+              Output("collapseTabelaEquipeMinima", "is_open"),
               Output("collapseTabelaGastosUBS", "is_open"),
               Input("dpEducacao", "value"),
               Input("dpSaude", "value"),
-              # Input("dpRegionalizacao", "value"),
+              # Input("dpUrbanismo", "value"),
+              Input("dpOrcamento", "value"),
               Input("optdados", "value"),
               Input("optanos", "value"),
               Input("optuniversalizacao", "value"),
               Input("sliderEja", "value")
               )
 
-def displayMapa(indicadores_educacao, indicadores_saude, dados, anos, anos_universalizacao, sliderEja):  # indicadores_regionalizacao
+def displayMapa(indicadores_educacao, indicadores_saude, indicadores_orcamento, dados, anos, anos_universalizacao, sliderEja):
     """Exibe os mapas e/ou gráficos gerados de acordo com os botões clicados, retornando
     as figuras de acordo.
 
     Variable type: String
 
-    Options: 'ideb', 'idep', 'abandono', 'universalizacao', 'gastos1', 'gastos2' ou 'eja'"""
+    Options: 'ideb', 'idep', 'abandono', 'universalizacao', 'gastos1', 'gastos2', 'eja', 'ubs' ou 'equipe'"""
 
     user_click = dash.callback_context.triggered[0]['prop_id'].split('.')[0]
     colapseddivistritossubpreituras = False
@@ -1139,6 +1232,7 @@ def displayMapa(indicadores_educacao, indicadores_saude, dados, anos, anos_unive
     collapseTabelaGastosPerCapita = False
     collapseTabelaGastosAbsoluto = False
     collapseTabelaEja = False
+    collapseTabelaEquipeMinima = False
     collapseTabelaGastosUBS = False
     card_Apresentacao_Direita = True
     fig = go.Figure()
@@ -1397,7 +1491,7 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                             collapseGraficosEsquerda = True
                             collapseGraficosDireita = True
                             card_Apresentacao_Direita = False
-                            card_universalizacao = True
+                            card_universalizacao = False
 
                         else:
 
@@ -1526,9 +1620,28 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                                         card_Apresentacao_Direita = False
                                         collapseTabelaGastosAbsoluto = True
 
+
     elif user_click == "dpSaude":
         if indicadores_saude is not None:
-            if indicadores_saude == 'ubs':
+            if indicadores_saude == 'equipe':
+
+                fig = gerar_mapa("equipe", anos, "", 0)
+
+                divEsquerdaSup = {"display": "block"}
+                divEsquerdaInf = {"display": "block"}
+                divGrafDireita = {"display": "block"}
+                divInfo = {"display": "block"}
+                info = info_idep
+                info_header = "Indicador - IDEP"
+                collapseGraficosDireita = True
+                card_Apresentacao_Direita = False
+                collapseTabelaEquipeMinima = True
+
+
+
+    elif user_click == "dpOrcamento":
+        if indicadores_orcamento is not None:
+            if indicadores_orcamento == 'ubs':
                 fig = gerar_mapa("ubs", anos, "", 0)
 
                 divEsquerdaSup = {"display": "block"}
@@ -1541,8 +1654,8 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                 card_Apresentacao_Direita = False
                 collapseTabelaGastosUBS = True
 
-    # elif user_click == "dpRegionalizacao":
-    #     if indicadores_regionalizacao is not None:
+    # elif user_click == "dpSaude":
+    #     if indicadores_saude is not None:
     #         pass
 
     else:  # indicadores não escolhidos
@@ -1551,14 +1664,13 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                 divEsquerdaInf2, divGrafDireita, info, divInfo, divSlider, info_header, collapseGraficosEsquerda,
                 collapseGraficosDireita, card_Apresentacao_Direita, collapseTabelaDistrito,
                 collapseTabelaSubprefeitura, collapseTabelaGastosPerCapita, collapseTabelaGastosAbsoluto,
-                collapseTabelaEja, collapseTabelaGastosUBS)
+                collapseTabelaEja, collapseTabelaEquipeMinima, collapseTabelaGastosUBS)
 
     return (fig, fig2, fig3, fig4, collapsedivdanos, colapseddivistritossubpreituras, card_universalizacao,
             divEsquerdaSup, divEsquerdaInf, divEsquerdaInf2, divGrafDireita, info, divInfo, divSlider, info_header,
             collapseGraficosEsquerda, collapseGraficosDireita, card_Apresentacao_Direita, collapseTabelaDistrito,
             collapseTabelaSubprefeitura, collapseTabelaGastosPerCapita, collapseTabelaGastosAbsoluto,
-            collapseTabelaEja, collapseTabelaGastosUBS)
-
+            collapseTabelaEja, collapseTabelaEquipeMinima, collapseTabelaGastosUBS)
 
 def toggle_modal(n1, n2, is_open):
     """Torna o botão de info funcional"""
