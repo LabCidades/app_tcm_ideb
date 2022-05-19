@@ -129,23 +129,39 @@ dfTabelaGastos_UBS = dfTabelaGastos_UBS.rename(columns={'ds_nome': 'Nome', 'ORC_
 
 dfTabelaGastos_UBS2 = dfDadosDistritos[['ds_nome', 'ORC_GASTO_UBS_2020']]
 dfTabelaGastos_UBS2 = dfTabelaGastos_UBS2.copy()
+dfTabelaGastos_UBS2 = dfTabelaGastos_UBS2.sort_values('ds_nome')
 dfTabelaGastos_UBS2['ORC_GASTO_UBS_2020'] = dfTabelaGastos_UBS2['ORC_GASTO_UBS_2020'].apply(
     lambda x: round(x, 2) if not pd.isnull(x) else 0)
 dfTabelaGastos_UBS2 = dfTabelaGastos_UBS2.rename(columns={'ds_nome': 'Nome', 'ORC_GASTO_UBS_2020': 'Gastos'},
-                                                inplace=False)
+                                                 inplace=False)
 
-dfTabelaEquipeMinima = pd.read_excel('data/equipe_minima_agrup_por_unidade.xlsx')
-dfTabelaEquipeMinima = dfTabelaEquipeMinima[['DISTRITOS', 'DESCRICAO_UNIDADE', 'CONTRATADA_UNID', 'APONTADA_UNID',
-                                             'PORCENTAGEM_UNIDADE_CENT']]
-dfTabelaEquipeMinima['PORCENTAGEM_UNIDADE_CENT'] = (dfTabelaEquipeMinima['PORCENTAGEM_UNIDADE_CENT']*100).apply(
-    lambda x: '{:,.2f}'.format(
-        float(str(round(x, 2)))) if not pd.isna(x) or x != 0 else 'Não se aplica') + "%"
-dfTabelaEquipeMinima = dfTabelaEquipeMinima.rename(columns={'DISTRITOS': 'Distrito',
-                                                            'DESCRICAO_UNIDADE': 'Unidade',
-                                                            'CONTRATADA_UNID': 'Horas contratadas',
-                                                            'APONTADA_UNID': 'Horas apontadas',
-                                                            'PORCENTAGEM_UNIDADE_CENT': 'Taxa cumprida'},
-                                                   inplace=False)
+dfTabelaGastos_UBS2_Unid = pd.read_csv('data/gasto_indireto_por_unid_2020.csv',
+                                       sep=";",
+                                       decimal=".")
+dfTabelaGastos_UBS2_Unid['Gasto'] = dfTabelaGastos_UBS2_Unid['Gasto'].replace('.', ',')
+
+dfTabelaEquipeMinima_Unid = pd.read_csv('data/equipe_minima_agrup_por_unidade_2020.csv',
+                                        sep=";",
+                                        decimal=".")
+dfTabelaEquipeMinima_Unid = dfTabelaEquipeMinima_Unid[['DISTRITOS', 'DESCRICAO_UNIDADE', 'CONTRATADA_UNID',
+                                                       'APONTADA_UNID', 'PORCENTAGEM_UNIDADE_CENT']]
+dfTabelaEquipeMinima_Unid = dfTabelaEquipeMinima_Unid.rename(columns={'DISTRITOS': 'Distrito',
+                                                                      'DESCRICAO_UNIDADE': 'Unidade',
+                                                                      'CONTRATADA_UNID': 'Horas contratadas',
+                                                                      'APONTADA_UNID': 'Horas apontadas',
+                                                                      'PORCENTAGEM_UNIDADE_CENT': 'Taxa cumprida'},
+                                                             inplace=False)
+
+dfTabelaEquipeMinima_Dist = pd.read_csv('data/equipe_minima_agrup_por_distrito_2020.csv',
+                                        sep=";",
+                                        decimal=".")
+dfTabelaEquipeMinima_Dist = dfTabelaEquipeMinima_Dist[['DISTRITOS', 'CONTRATADA_DIST',
+                                                       'APONTADA_DIST', 'PORCENTAGEM_DIST']]
+dfTabelaEquipeMinima_Dist = dfTabelaEquipeMinima_Dist.rename(columns={'DISTRITOS': 'Distrito',
+                                                                      'CONTRATADA_DIST': 'Horas contratadas',
+                                                                      'APONTADA_DIST': 'Horas apontadas',
+                                                                      'PORCENTAGEM_DIST': 'Taxa cumprida'},
+                                                             inplace=False)
 
 # dfTabelaGastos_2019 = dfDadosDistritos[['ds_nome', 'gastos_2019']]
 # dfTabelaGastos_2019 = dfTabelaGastos_2019.copy()
@@ -801,7 +817,7 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                             dbc.Collapse(
                                 dcc.Dropdown(
                                     id='dpSaude',
-                                    options=[{'label': 'Equipe Miníma Contratada (2020)', 'value': 'equipe'},
+                                    options=[{'label': 'Equipe Mínima Contratada (2020)', 'value': 'equipe'},
                                              ],
                                     placeholder='Escolha um indicador',
                                     style={'backgroundColor': colors['background']}),
@@ -820,7 +836,7 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                                 dcc.Dropdown(
                                     id='dpOrcamento',
                                     options=[{'label': 'Gasto com Pessoal na Administração Direta por UBS (2020)', 'value': 'ubs'},
-                                             {'label': 'Gasto com Pessoal na Administração Indireta por UBS (2020)', 'value': 'gastoubs'}
+                                             {'label': 'Gasto com Pessoal na Administração Indireta (OSS) por UBS (2020)', 'value': 'gastoubs'}
                                              ],
                                     placeholder='Escolha um indicador',
                                     style={'backgroundColor': colors['background']}),
@@ -966,11 +982,11 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
             dbc.Collapse(
                 dbc.Card(style={'backgroundColor': colors['background'], 'color': colors['topic_text']}, children=[
                     dbc.CardBody([
-                        html.H6("Equipe Miníma", className="card-title"),
+                        html.H6("Equipe Miníma por Distrito", className="card-title"),
                         html.Div(style={'backgroundColor': colors['background'], 'color': colors['text']},
-                                 id="divTabelaEquipeMinima", children=[
-                                dash_table.DataTable(id="tabelaEquipeMinima",
-                                                     data=dfTabelaEquipeMinima.to_dict('records'),
+                                 id="divTabelaEquipeMinimaDist", children=[
+                                dash_table.DataTable(id="tabelaEquipeMinimaDist",
+                                                     data=dfTabelaEquipeMinima_Dist.to_dict('records'),
                                                      sort_action='native',
                                                      style_table={'height': '350px', 'overflowY': 'auto'},
                                                      style_header={'fontSize': 13, 'font-family': 'arial',
@@ -990,14 +1006,50 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                                                              group_delimiter=".",
                                                              decimal_delimiter=",",
                                                          )}
-                                                         for c in dfTabelaEquipeMinima.columns]
+                                                         for c in dfTabelaEquipeMinima_Dist.columns]
                                                      )
 
                             ]),
 
                     ])
                 ], color="dark", outline=True),
-                id="collapseTabelaEquipeMinima", is_open=False),
+                id="collapseTabelaEquipeMinimaDist", is_open=False),
+
+            dbc.Collapse(
+                dbc.Card(style={'backgroundColor': colors['background'], 'color': colors['topic_text']}, children=[
+                    dbc.CardBody([
+                        html.H6("Equipe Miníma por Unidade", className="card-title"),
+                        html.Div(style={'backgroundColor': colors['background'], 'color': colors['text']},
+                                 id="divTabelaEquipeMinimaUnid", children=[
+                                dash_table.DataTable(id="tabelaEquipeMinimaUnid",
+                                                     data=dfTabelaEquipeMinima_Unid.to_dict('records'),
+                                                     sort_action='native',
+                                                     style_table={'height': '350px', 'overflowY': 'auto'},
+                                                     style_header={'fontSize': 13, 'font-family': 'arial',
+                                                                   'fontWeight': 'bold'},
+                                                     style_cell={'backgroundColor': colors['table_cell'],
+                                                                 'color': colors['table_text'],
+                                                                 'textAlign': 'left',
+                                                                 'width': '85px',
+                                                                 'whiteSpace': 'normal', 'fontSize': 13,
+                                                                 'font-family': 'arial'},
+                                                     columns=[
+                                                         {'id': c, 'name': c, 'type': 'numeric', 'format': Format(
+                                                             scheme=Scheme.fixed,
+                                                             precision=0,
+                                                             group=Group.yes,
+                                                             groups=3,
+                                                             group_delimiter=".",
+                                                             decimal_delimiter=",",
+                                                         )}
+                                                         for c in dfTabelaEquipeMinima_Unid.columns]
+                                                     )
+
+                            ]),
+
+                    ])
+                ], color="dark", outline=True),
+                id="collapseTabelaEquipeMinimaUnid", is_open=False),
 
             dbc.Collapse(
                 dbc.Card(style={'backgroundColor': colors['background'], 'color': colors['topic_text']}, children=[
@@ -1068,6 +1120,38 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                     ])
                 ], color="dark", outline=True),
                 id="collapseTabelaGastosUBS2", is_open=False),
+
+            dbc.Collapse(
+                dbc.Card(style={'margin-top': 20,
+                                'backgroundColor': colors['background'],
+                                'color': colors['topic_text']},
+                         children=[
+                             html.H6("Gasto por Unidade", className="card-title"),
+                             html.Div(
+                                 style={'backgroundColor': colors['background'], 'color': colors['text']},
+                                 id="divdfTabelaGastos_UBS2_Unid", children=[
+                                     dash_table.DataTable(id="dfTabelaGastos_UBS2_Unid",
+                                                          data=dfTabelaGastos_UBS2_Unid.to_dict('records'),
+                                                          sort_action='native',
+                                                          style_table={'height': '350px',
+                                                                       'overflowY': 'auto'},
+                                                          style_header={'fontSize': 13,
+                                                                        'font-family': 'arial',
+                                                                        'fontWeight': 'bold',
+                                                                        'width': '250px'},
+                                                          style_cell={
+                                                              'backgroundColor': colors['table_cell'],
+                                                              'color': colors['table_text'],
+                                                              'textAlign': 'left', 'minWidth': '50px',
+                                                              'whiteSpace': 'normal', 'fontSize': 13,
+                                                              'font-family': 'arial'},
+                                                          columns=[{'id': c, 'name': c} for c in
+                                                                   dfTabelaGastos_UBS2_Unid.columns])
+
+                                 ]),
+
+                         ], color="dark", outline=True),
+                id="collapsedfTabelaGastos_UBS2_Unid", is_open=False),
 
             dbc.Collapse(
 
@@ -1285,9 +1369,11 @@ def displayClick(btn1, btn2, btn3, btn4):
               Output("collapseTabelaGastosPerCapita", "is_open"),
               Output("collapseTabelaGastosAbsoluto", "is_open"),
               Output("collapseTabelaEja", "is_open"),
-              Output("collapseTabelaEquipeMinima", "is_open"),
+              Output("collapseTabelaEquipeMinimaDist", "is_open"),
+              Output("collapseTabelaEquipeMinimaUnid", "is_open"),
               Output("collapseTabelaGastosUBS", "is_open"),
               Output("collapseTabelaGastosUBS2", "is_open"),
+              Output("collapsedfTabelaGastos_UBS2_Unid", "is_open"),
               Input("dpEducacao", "value"),
               Input("dpSaude", "value"),
               # Input("dpUrbanismo", "value"),
@@ -1317,9 +1403,11 @@ def displayMapa(indicadores_educacao, indicadores_saude, indicadores_orcamento, 
     collapseTabelaGastosPerCapita = False
     collapseTabelaGastosAbsoluto = False
     collapseTabelaEja = False
-    collapseTabelaEquipeMinima = False
+    collapseTabelaEquipeMinimaDist = False
+    collapseTabelaEquipeMinimaUnid = False
     collapseTabelaGastosUBS = False
     collapseTabelaGastosUBS2 = False
+    collapsedfTabelaGastos_UBS2_Unid = False
     card_Apresentacao_Direita = True
     fig = go.Figure()
     fig2 = go.Figure()
@@ -1721,7 +1809,8 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                 info_header = "Indicador - IDEP"
                 collapseGraficosDireita = True
                 card_Apresentacao_Direita = False
-                collapseTabelaEquipeMinima = True
+                collapseTabelaEquipeMinimaDist = True
+                collapseTabelaEquipeMinimaUnid = True
 
 
     elif user_click == "dpOrcamento":
@@ -1753,6 +1842,7 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                     collapseGraficosDireita = True
                     card_Apresentacao_Direita = False
                     collapseTabelaGastosUBS2 = True
+                    collapsedfTabelaGastos_UBS2_Unid = True
 
 
     # elif user_click == "dpSaude":
@@ -1765,13 +1855,15 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                 divEsquerdaInf2, divGrafDireita, info, divInfo, divSlider, info_header, collapseGraficosEsquerda,
                 collapseGraficosDireita, card_Apresentacao_Direita, collapseTabelaDistrito,
                 collapseTabelaSubprefeitura, collapseTabelaGastosPerCapita, collapseTabelaGastosAbsoluto,
-                collapseTabelaEja, collapseTabelaEquipeMinima, collapseTabelaGastosUBS, collapseTabelaGastosUBS2)
+                collapseTabelaEja, collapseTabelaEquipeMinimaDist, collapseTabelaEquipeMinimaUnid, collapseTabelaGastosUBS, collapseTabelaGastosUBS2,
+                collapsedfTabelaGastos_UBS2_Unid)
 
     return (fig, fig2, fig3, fig4, collapsedivdanos, colapseddivistritossubpreituras, card_universalizacao,
             divEsquerdaSup, divEsquerdaInf, divEsquerdaInf2, divGrafDireita, info, divInfo, divSlider, info_header,
             collapseGraficosEsquerda, collapseGraficosDireita, card_Apresentacao_Direita, collapseTabelaDistrito,
             collapseTabelaSubprefeitura, collapseTabelaGastosPerCapita, collapseTabelaGastosAbsoluto,
-            collapseTabelaEja, collapseTabelaEquipeMinima, collapseTabelaGastosUBS, collapseTabelaGastosUBS2)
+            collapseTabelaEja, collapseTabelaEquipeMinimaDist, collapseTabelaEquipeMinimaUnid, collapseTabelaGastosUBS, collapseTabelaGastosUBS2,
+            collapsedfTabelaGastos_UBS2_Unid)
 
 def toggle_modal(n1, n2, is_open):
     """Torna o botão de info funcional"""

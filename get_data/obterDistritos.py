@@ -72,8 +72,7 @@ def distritos(path_salvo, dfIdebIniciais, dfIdebFinais):
         dfGastos['SAU_PORCENTAGEM_HORAS_CUMPRIDAS_DIST_2020'] = dfGastos['SAU_PORCENTAGEM_HORAS_CUMPRIDAS_DIST_2020'].apply(
             lambda x: round(x, 4))
 
-        dfGastos['ORC_GASTO_UBS_2020'] = dfGastos['ORC_GASTO_UBS_2020'].str.replace(',', '.').astype(
-            float)
+        dfGastos['ORC_GASTO_UBS_2020'] = dfGastos['ORC_GASTO_UBS_2020'].str.replace(',', '.').astype(float)
         dfGastos['ORC_GASTO_UBS_2020'] = pd.to_numeric(dfGastos['ORC_GASTO_UBS_2020'], errors='coerce')
         dfGastos['ORC_GASTO_UBS_2020'] = dfGastos['ORC_GASTO_UBS_2020'].apply(
             lambda x: round(x, 2) if not pd.isnull(x) else 0)
