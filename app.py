@@ -818,6 +818,8 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                                 dcc.Dropdown(
                                     id='dpSaude',
                                     options=[{'label': 'Equipe Mínima Contratada (2020)', 'value': 'equipe'},
+                                             {'label': 'Gasto com Pessoal na Administração Direta por UBS (2020)', 'value': 'ubs'},
+                                             {'label': 'Gasto na Administração Indireta (OSS) por UBS (2020)', 'value': 'gastoubs'}
                                              ],
                                     placeholder='Escolha um indicador',
                                     style={'backgroundColor': colors['background']}),
@@ -835,8 +837,9 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                             dbc.Collapse(
                                 dcc.Dropdown(
                                     id='dpOrcamento',
-                                    options=[{'label': 'Gasto com Pessoal na Administração Direta por UBS (2020)', 'value': 'ubs'},
-                                             {'label': 'Gasto na Administração Indireta (OSS) por UBS (2020)', 'value': 'gastoubs'}
+                                    options=[{'label': 'Em desenvolvimento', 'value': 'saude1'}
+                                             # {'label': 'Gasto com Pessoal na Administração Direta por UBS (2020)', 'value': 'ubs'},
+                                             # {'label': 'Gasto na Administração Indireta (OSS) por UBS (2020)', 'value': 'gastoubs'}
                                              ],
                                     placeholder='Escolha um indicador',
                                     style={'backgroundColor': colors['background']}),
@@ -1422,6 +1425,8 @@ def displayMapa(indicadores_educacao, indicadores_saude, indicadores_orcamento, 
     info = "vazio"
     info_header = "vazio"
 
+    info_default = ''' '''
+
     info_ideb = '''Os dados acima refletem o ano de 2019 e
 foram extraídos dos indicadores educacionais do Inep, 
 disponíveis no portal 'Dados Abertos do Inep.', href = "https://www.gov.br/inep/pt-br/areas-de-atuacao/pesquisas-estatisticas-e-indicadores/ideb/resultados"),
@@ -1442,6 +1447,21 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
     *Indicador de Complexidade de Gestão (ICG): resume em uma única medida as informações de porte, turnos de funcionamento, nível de complexidade das etapas de ensino e quantidade de etapas ofertadas. Ainda que estes fatores não contemplem em totalidade todos os elementos e dimensões envolvidas na gestão escolar, verifica-se que os itens selecionados colaboram para a construção de um índice que potencialmente auxilia na contextualização de resultados das avaliações. A base desse indicador é o ano de 2018.
     Para mais informações sobre o Índice de Desenvolvimento da Educação Paulistana (IDEP) consulte a Nota Técnica que acompanha este Conjunto de Dados (disponível para download em:  http://dados.prefeitura.sp.gov.br/dataset/idep ).
     Obs: Os dados com * indicam que a escola não atendeu a um dos critérios necessários para o cálculo do Idep ou das suas metas."'''
+
+    info_UBS_Indireta_OSS_2020 = '''Descrição do indicador: o indicador demonstra o total da alocação de gasto em uma Unidade Básica de Saúde (UBS) efetuado pela Organização Social que o gere, conforme os dados da prestação de contas realizada pelas OSS.
+    Relevância do indicador: demonstração da alocação de custos em determinada unidade, de forma a demonstrar, de maneira regionalizada, os recursos alocados para determinada população. O indicador também contribui para que posteriores indicadores e estudos possam ser feitos com base nos dados dele.
+    Fonte: Dados fornecidos pela prestação de contas das OSS, extraídos do sistema WebSAASS (Sistema de Acompanhamento e Avaliação dos Serviços de Saúde).
+    Fórmula de cálculo: total de custos efetuados pela Organização Social, em determinado mês, em uma UBS específica.
+    Unidade de medida: Reais (R$).
+    Valor base: N/A.
+    Notas técnicas: a) os dados são apurados através do WebSAASS, sistema que é alimentado pela própria Organização Social, de forma a fornecer elementos para a Secretaria Municipal de Saúde (SMS) realizar a fiscalização do contrato de gestão; b) alguns custos da unidade não são abrangidos por esse indicador, na medida que não são efetuados pela Organização Social (ex.: medicamentos utilizados na unidade, eventual servidor cedido pela SMS, etc.).'''
+
+    info_equipeMin_2020 = '''Descrição do indicador: o indicador apresenta, por distrito, se a equipe mínima vinculada aos serviços da Estratégia Saúde da Família foi contratada pelas OSS conforme o previsto no contrato entre as OSS e a Prefeitura.
+    Relevância do indicador: as equipes mínimas possuem relevância no acompanhamento dos contratos de gestão, uma vez que indicam um quantitativo mínimo de profissionais que a organização social deve contratar, de forma a prestar adequadamente os serviços de saúde que é obrigada.
+    Fonte: Dados fornecidos pela prestação de contas das OSS, extraídos do sistema WebSAASS (Sistema de Acompanhamento e Avaliação dos Serviços de Saúde).
+    Fórmula de cálculo: diferença entre as horas efetivamente contratadas e as horas previstas no contrato entre a Prefeitura e as OSS
+    Unidade de medida: %.
+    Valor base: N/A.'''
 
     if user_click == "dpEducacao":
         if indicadores_educacao is not None:
@@ -1805,44 +1825,75 @@ A partir desse cruzamento foi feita a média do Ideb por Distrito mostrada na fi
                 divEsquerdaInf = {"display": "block"}
                 divGrafDireita = {"display": "block"}
                 divInfo = {"display": "block"}
-                info = info_idep
-                info_header = "Indicador - IDEP"
+                info = info_equipeMin_2020
+                info_header = "Indicador - Saúde"
                 collapseGraficosDireita = True
                 card_Apresentacao_Direita = False
                 collapseTabelaEquipeMinimaDist = True
                 collapseTabelaEquipeMinimaUnid = True
 
-
-    elif user_click == "dpOrcamento":
-        if indicadores_orcamento is not None:
-            if indicadores_orcamento == 'ubs':
-                fig = gerar_mapa("ubs", anos, "", 0)
-
-                divEsquerdaSup = {"display": "block"}
-                divEsquerdaInf = {"display": "block"}
-                divGrafDireita = {"display": "block"}
-                divInfo = {"display": "block"}
-                info = info_idep
-                info_header = "Indicador - Saúde"
-                collapseGraficosDireita = True
-                card_Apresentacao_Direita = False
-                collapseTabelaGastosUBS = True
-
             else:
 
-                if indicadores_orcamento == 'gastoubs':
-                    fig = gerar_mapa("gastoubs", anos, "", 0)
+                if indicadores_saude == 'ubs':
+                    fig = gerar_mapa("ubs", anos, "", 0)
 
                     divEsquerdaSup = {"display": "block"}
                     divEsquerdaInf = {"display": "block"}
                     divGrafDireita = {"display": "block"}
                     divInfo = {"display": "block"}
-                    info = info_idep
+                    info = info_default
                     info_header = "Indicador - Saúde"
                     collapseGraficosDireita = True
                     card_Apresentacao_Direita = False
-                    collapseTabelaGastosUBS2 = True
-                    collapsedfTabelaGastos_UBS2_Unid = True
+                    collapseTabelaGastosUBS = True
+
+                else:
+
+                    if indicadores_saude == 'gastoubs':
+                        fig = gerar_mapa("gastoubs", anos, "", 0)
+
+                        divEsquerdaSup = {"display": "block"}
+                        divEsquerdaInf = {"display": "block"}
+                        divGrafDireita = {"display": "block"}
+                        divInfo = {"display": "block"}
+                        info = info_UBS_Indireta_OSS_2020
+                        info_header = "Indicador - Saúde"
+                        collapseGraficosDireita = True
+                        card_Apresentacao_Direita = False
+                        collapseTabelaGastosUBS2 = True
+                        collapsedfTabelaGastos_UBS2_Unid = True
+
+
+    # elif user_click == "dpOrcamento":
+    #     if indicadores_orcamento is not None:
+    #         if indicadores_orcamento == 'ubs':
+    #             fig = gerar_mapa("ubs", anos, "", 0)
+    #
+    #             divEsquerdaSup = {"display": "block"}
+    #             divEsquerdaInf = {"display": "block"}
+    #             divGrafDireita = {"display": "block"}
+    #             divInfo = {"display": "block"}
+    #             info = info_default
+    #             info_header = "Indicador - Saúde"
+    #             collapseGraficosDireita = True
+    #             card_Apresentacao_Direita = False
+    #             collapseTabelaGastosUBS = True
+    #
+    #         else:
+    #
+    #             if indicadores_orcamento == 'gastoubs':
+    #                 fig = gerar_mapa("gastoubs", anos, "", 0)
+    #
+    #                 divEsquerdaSup = {"display": "block"}
+    #                 divEsquerdaInf = {"display": "block"}
+    #                 divGrafDireita = {"display": "block"}
+    #                 divInfo = {"display": "block"}
+    #                 info = info_UBS_Indireta_OSS_2020
+    #                 info_header = "Indicador - Saúde"
+    #                 collapseGraficosDireita = True
+    #                 card_Apresentacao_Direita = False
+    #                 collapseTabelaGastosUBS2 = True
+    #                 collapsedfTabelaGastos_UBS2_Unid = True
 
 
     # elif user_click == "dpSaude":
