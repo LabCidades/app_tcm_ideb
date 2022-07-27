@@ -683,7 +683,7 @@ def gerar_mapa(tipografico, anos_ideb, tipodados, anos_universalizacao=0):
                                 fig.update_layout(margin=dict(l=0, r=0, t=50, b=0),
                                                   showlegend=False,
                                                   height=513,
-                                                  title="Gasto com Pessoal na Administração Indireta por UBS de 2020",
+                                                  title="Gasto na Administração Indireta por UBS de 2020",
                                                   plot_bgcolor=colors['chart_background'],
                                                   paper_bgcolor=colors['chart_background']
                                                   )
@@ -836,7 +836,7 @@ app.layout = dbc.Container(style={'backgroundColor': colors['background']}, chil
                                 dcc.Dropdown(
                                     id='dpOrcamento',
                                     options=[{'label': 'Gasto com Pessoal na Administração Direta por UBS (2020)', 'value': 'ubs'},
-                                             {'label': 'Gasto com Pessoal na Administração Indireta (OSS) por UBS (2020)', 'value': 'gastoubs'}
+                                             {'label': 'Gasto na Administração Indireta (OSS) por UBS (2020)', 'value': 'gastoubs'}
                                              ],
                                     placeholder='Escolha um indicador',
                                     style={'backgroundColor': colors['background']}),
