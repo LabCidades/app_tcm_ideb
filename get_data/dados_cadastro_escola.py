@@ -3,27 +3,30 @@ import pandas as pd
 import os
 from .dados_abertos import DadosAbertos
 
+
 class DadosCadastroEscola:
     
     url = ('http://dados.prefeitura.sp.gov.br/pt_PT/'
-            'dataset/cadastro-de-escolas-municipais-conveniadas-e-privadas')
-    extensoes= ('csv',)
+           'dataset/cadastro-de-escolas-municipais-conveniadas-e-privadas')
+    extensoes = ('csv',)
 
-    path_salvar =  'raw_data/cadastro_2019/'
+    path_salvar = 'raw_data/cadastro_2019/'
     
     def __init__(self):
         
         self.dados_abertos_client = DadosAbertos(self.url, self.extensoes)
-    
+
     def parse_ano_rec(self, recurso):
+        """Define a variável ano_rec e retorna ela"""
         
         ano_rec = recurso['descricao'].split('/')[-1].strip('.,')
         
         return ano_rec
     
     def baixar_cadastro_ano(self, ano):
-    
-        recursos_disponiveis =  self.dados_abertos_client.recursos
+        """Analisa os recursos disponíveis e os baixa"""
+
+        recursos_disponiveis = self.dados_abertos_client.recursos
         for rec in recursos_disponiveis:
             ano_rec = self.parse_ano_rec(rec)
             if int(ano_rec) == ano:
@@ -33,7 +36,8 @@ class DadosCadastroEscola:
         else:
             raise ValueError(f'Ano de cadastro {ano} não encontrado')
 
-    def salvar_dados(self, df, sep, save_path = None):
+    def salvar_dados(self, df, sep, save_path=None):
+        """Salvando o caminho dos dados do cadastro_2019"""
 
         if save_path is None:
             save_path = self.path_salvar
@@ -45,8 +49,9 @@ class DadosCadastroEscola:
 
         df.to_csv(file_name, sep=sep, index=False)
         print('Dados cadastrais salvos com sucesso')
-            
-    def dataframe_ano(self, ano, sep = ';', save_data=True):
+
+    def dataframe_ano(self, ano, sep=';', save_data=True):
+        """Gera um DataFrame com base no ano cadastral e retorna um df"""
         
         download = self.baixar_cadastro_ano(ano)
         
@@ -54,9 +59,5 @@ class DadosCadastroEscola:
 
         if save_data:
             self.salvar_dados(df, sep)
-        
+
         return df
-
-
-
-        

@@ -6,23 +6,26 @@ from get_data import get_distritos
 class StaticMapMakerIdeb:
 
     def solve_dados_distrito(self, dados_por_distrito=None, tipo_ideb=None):
+        """Regionalizando ideb por distrito de acordo com seu tipo"""
 
         if dados_por_distrito is None:
-                if tipo_ideb not in ('iniciais', 'finais'):
-                    raise ValueError(f'''If dados_por_distrito is None must specify tipo_distrito.
-                                    Accepted values are: "finais" or "iniciais"''')
+            if tipo_ideb not in ('iniciais', 'finais'):
+                raise ValueError(f'''If dados_por_distrito is None must specify tipo_distrito.
+                                 Accepted values are: "finais" or "iniciais"''')
                 regionalizar = RegionalizarDistritos()
-                dados_por_distrito = regionalizar(tipo_ideb)
-        
+            dados_por_distrito = regionalizar(tipo_ideb)
+
         return dados_por_distrito
 
     def get_limites_distritos(self):
+        """Pega os dados geométricos das fronteiras dos distritos"""
 
         boundary_distritos = get_distritos()['geometry'].boundary
 
         return boundary_distritos
 
     def gerar_title(self, tipo_ideb):
+        """Cria um titulo"""
 
         if tipo_ideb is None:
             return f'Ideb Médio por Distrito'
@@ -31,18 +34,18 @@ class StaticMapMakerIdeb:
 
         return title
 
-
     def gerar_mapa_estatico(self, dados_por_distrito=None, tipo_ideb=None):
+        """Gera um mapa estático do ideb médio por distrito"""
 
         dados_por_distrito = self.solve_dados_distrito(dados_por_distrito, tipo_ideb)
         limites = self.get_limites_distritos()
         titulo_mapa = self.gerar_title(tipo_ideb)
 
         fig, ax = plt.subplots()
-        fig.set_size_inches(8.27, 11.69) #A4 Portrait
-        ax =dados_por_distrito.plot(ax=ax, column='ideb_2019', legend=True, 
-                    legend_kwds={'label': "Ideb médio",'orientation': "vertical"}, cmap='Reds',
-                    alpha=0.5, edgecolor='k')
+        fig.set_size_inches(8.27, 11.69)  # A4 Portrait
+        ax = dados_por_distrito.plot(ax=ax, column='ideb_2019', legend=True,
+                                     legend_kwds={'label': "Ideb médio", 'orientation': "vertical"}, cmap='Reds',
+                                     alpha=0.5, edgecolor='k')
         ax.set_title(titulo_mapa, size=20)
         ax.set_yticklabels([])
         ax.set_xticklabels([])
@@ -53,6 +56,7 @@ class StaticMapMakerIdeb:
         return ax
 
     def __call__(self, tipo_ideb):
+        """Roda o programa que gera o mapa estático"""
 
         return self.gerar_mapa_estatico(tipo_ideb=tipo_ideb)
 
